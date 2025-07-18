@@ -1,3 +1,4 @@
+/* Updated style.css with theme toggle, responsive fix, and dark mode */
 :root {
   --primary-color: #333;
   --secondary-color: #f4f4f4;
@@ -7,6 +8,25 @@
   --paper-bg: #ffffff;
   --font-sans: 'Inter', sans-serif;
   --font-serif: 'Tinos', serif;
+}
+
+body.dark {
+  --primary-color: #ddd;
+  --secondary-color: #1a1a1a;
+  --text-dark: #eee;
+  --text-light: #aaa;
+  --border-color: #555;
+  --paper-bg: #2b2b2b;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -116,4 +136,16 @@ button:disabled { background-color: #aaa; cursor: not-allowed; }
 @media screen and (max-width: 1024px) {
   .main-container { flex-direction: column; height: auto; }
   .column { width: 100%; height: auto; border: none; }
+}
+
+@media (max-width: 480px) {
+  input, textarea {
+    font-size: 0.9rem;
+  }
+  .resume-paper {
+    padding: 1.5rem 2rem;
+  }
+  .preview-header h3 {
+    font-size: 1.5rem;
+  }
 }

@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tinos:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <button id="toggle-theme" class="theme-toggle" aria-label="Toggle Theme">🌙 Toggle Theme</button>
+
     <div class="main-container">
         <div id="editor" class="column">
             <header>
@@ -20,30 +22,39 @@
                     <span class="spinner hidden"></span>
                 </button>
             </header>
+
             <form id="resume-form">
                 <fieldset>
                     <legend>👤 Personal Details</legend>
-                    <input type="text" placeholder="Full Name" id="name" class="live-update" data-target="#preview-name">
-                    <input type="email" placeholder="Email Address" id="email" class="live-update" data-target="#preview-contact">
-                    <input type="tel" placeholder="WhatsApp No." id="phone" class="live-update" data-target="#preview-contact">
-                    <textarea id="address" rows="3" placeholder="Full Address" class="live-update" data-target="#preview-contact"></textarea>
+
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" class="live-update" data-target="#preview-name">
+
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="live-update" data-target="#preview-contact">
+
+                    <label for="phone">WhatsApp No.</label>
+                    <input type="tel" id="phone" class="live-update" data-target="#preview-contact">
+
+                    <label for="address">Full Address</label>
+                    <textarea id="address" rows="3" class="live-update" data-target="#preview-contact"></textarea>
                 </fieldset>
-                
+
                 <fieldset>
                     <legend>🎓 Education</legend>
-                    <div id="education-entries">
-                        </div>
+                    <div id="education-entries"></div>
                     <button type="button" id="add-education-btn" class="add-btn">Add Education</button>
                 </fieldset>
 
                 <fieldset>
                     <legend>💼 Professional Details</legend>
+
                     <label for="skills">Skills</label>
                     <textarea id="skills" rows="4" placeholder="Enter skills, one per line..." class="live-update" data-target="#preview-skills"></textarea>
-                    
+
                     <label for="experience">Experience</label>
                     <textarea id="experience" rows="6" placeholder="Describe work experience, one role per line..." class="live-update" data-target="#preview-experience"></textarea>
-                    
+
                     <label for="strengths">Strengths</label>
                     <textarea id="strengths" rows="3" placeholder="Enter strengths, one per line..." class="live-update" data-target="#preview-strengths"></textarea>
 
@@ -60,24 +71,29 @@
                     <h3 id="preview-name">Your Name</h3>
                     <p id="preview-contact">Your Contact Info</p>
                 </div>
+
                 <div class="preview-section">
                     <h4>EDUCATION</h4>
                     <div id="preview-education">
                         <p class="placeholder-text">Your education will appear here.</p>
                     </div>
                 </div>
+
                 <div id="preview-skills" class="preview-section">
                     <h4>SKILLS</h4>
                     <p class="placeholder-text">Your skills will appear here.</p>
                 </div>
+
                 <div id="preview-experience" class="preview-section">
                     <h4>EXPERIENCE</h4>
                     <p class="placeholder-text">Your experience will appear here.</p>
                 </div>
-                 <div id="preview-strengths" class="preview-section">
+
+                <div id="preview-strengths" class="preview-section">
                     <h4>STRENGTHS</h4>
                     <p class="placeholder-text">Your strengths will appear here.</p>
                 </div>
+
                 <div id="preview-hobbies" class="preview-section">
                     <h4>HOBBIES</h4>
                     <p class="placeholder-text">Your hobbies will appear here.</p>
