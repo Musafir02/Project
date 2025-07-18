@@ -1,202 +1,65 @@
-const form = document.getElementById("resumeForm");
-const previewBox = document.getElementById("resumePreview");
-const downloadBtn = document.getElementById("downloadBtn");
-const { jsPDF } = window.jspdf;
+import jsPDF from "https://cdn.skypack.dev/jspdf";
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const get = id => document.getElementById(id).value;
+const form = document.getElementById("resumeForm"); const previewBox = document.getElementById("resumePreview"); const downloadBtn = document.getElementById("downloadBtn"); const suggestionsBox = document.getElementById("suggestionsBox");
 
-  const data = {
-    name: get("name"),
-    email: get("email"),
-    phone: get("phone"),
-    address: get("address"),
-    father: get("father"),
-    mother: get("mother"),
-    sisters: get("sisters"),
-    marital: get("marital"),
-    education: get("education"),
-    otherQualifications: get("otherQualifications"),
-    skills: get("skills"),
-    experience: get("experience"),
-    languages: get("languages"),
-    strengths: get("strengths"),
-    hobbies: get("hobbies"),
-    job: get("job")
-  };
+form.addEventListener("submit", async function (e) { e.preventDefault();
 
-  previewBox.innerHTML = `
-    <h2>${data.name}</h2>
-    <p><strong>Email:</strong> ${data.email} &nbsp;&nbsp; <strong>Phone:</strong> ${data.phone}</p>
-    <p><strong>Address:</strong> ${data.address}</p>
-    <hr>
-    <h3>Family Details</h3>
-    <ul>
-      <li><strong>Father:</strong> ${data.father}</li>
-      <li><strong>Mother:</strong> ${data.mother}</li>
-      <li><strong>Sisters:</strong> ${data.sisters}</li>
-      <li><strong>Marital Status:</strong> ${data.marital}</li>
-    </ul>
-    <h3>Education</h3>
-    <p>${data.education}</p>
-    <h3>Other Qualifications</h3><p>${data.otherQualifications}</p>
-    <h3>Skills</h3><p>${data.skills}</p>
-    <h3>Experience</h3><p>${data.experience}</p>
-    <h3>Languages Known</h3><p>${data.languages}</p>
-    <h3>Strengths</h3><p>${data.strengths}</p>
-    <h3>Hobbies</h3><p>${data.hobbies}</p>
-    <h3>Job Applied For</h3><p>${data.job}</p>
-  `;
+const name = document.getElementById("name").value; const email = document.getElementById("email").value; const phone = document.getElementById("phone").value; const address = document.getElementById("address").value; const father = document.getElementById("father").value; const mother = document.getElementById("mother").value; const sisters = document.getElementById("sisters").value; const marital = document.getElementById("marital").value; const otherQualifications = document.getElementById("otherQualifications").value; const skills = document.getElementById("skills").value; const experience = document.getElementById("experience").value; const languages = document.getElementById("languages").value; const strengths = document.getElementById("strengths").value; const hobbies = document.getElementById("hobbies").value; const job = document.getElementById("job").value;
 
-  downloadBtn.classList.remove("hidden");
-  downloadBtn.data = data;
+const selectedQuals = document.querySelectorAll(".edu-check:checked"); let educationArray = [];
 
-  await getSuggestionsFromDeepSeek(data.job, data.skills);
-});
+selectedQuals.forEach((qual) => { const q = qual.value; const inst = document.querySelector([name='institute-${q}']).value; const board = document.querySelector([name='board-${q}']).value; const year = document.querySelector([name='year-${q}']).value; const grade = document.querySelector([name='grade-${q}']).value; educationArray.push({ qualification: q, institute: inst, board, year, grade }); });
 
-// PDF Export with professional formatting
-downloadBtn.addEventListener("click", () => {
-  const data = downloadBtn.data;
-  const doc = new jsPDF();
-  let y = 10;
+const { jsPDF } = window.jspdf; const doc = new jsPDF(); let y = 10;
 
-  // Title
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("RESUME", 105, y, { align: "center" });
-  y += 10;
+doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.text("RESUME", 105, y, null, null, "center");
 
-  // Top Section
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text(data.name, 10, y);
-  doc.setFont("helvetica", "normal");
-  y += 6;
-  doc.text(`WhatsApp No.: ${data.phone}`, 10, y);
-  y += 6;
-  doc.text(`E-mail: ${data.email}`, 10, y);
-  y += 6;
-  doc.text(data.address, 10, y);
-  y += 8;
-  doc.line(10, y, 200, y);
-  y += 6;
+y += 10; doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.text(name, 10, y); doc.setFont("helvetica", "normal"); doc.text(Email: ${email}, 10, y + 6); doc.text(Phone: ${phone}, 120, y + 6); doc.text(Address: ${address}, 10, y + 12);
 
-  const section = (title, content) => {
-    doc.setFont("helvetica", "bold");
-    doc.text(title, 10, y);
-    y += 6;
-    doc.setFont("helvetica", "normal");
-    const lines = doc.splitTextToSize(content, 190);
-    doc.text(lines, 10, y);
-    y += lines.length * 6 + 4;
-  };
+y += 24; doc.setFont("helvetica", "bold"); doc.text("Family Details", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(Father's Name: ${father}, 10, y); y += 6; doc.text(Mother's Name: ${mother}, 10, y); y += 6; doc.text(Sisters: ${sisters}, 10, y); y += 6; doc.text(Marital Status: ${marital}, 10, y);
 
-  // Sections
-  section("Family Details", `• Fathers Name: ${data.father}\n• Mothers Name: ${data.mother}\n• Sisters: ${data.sisters}\n• Marital Status: ${data.marital}`);
+y += 10; doc.setFont("helvetica", "bold"); doc.text("EDUCATION", 10, y); y += 6;
 
-  // Education table (static headers + dynamic rows from textarea)
-  doc.setFont("helvetica", "bold");
-  doc.text("EDUCATION:", 10, y);
-  y += 6;
+doc.setFont("helvetica", "normal"); doc.autoTable({ startY: y, head: [["Qualification", "Institute", "Board/University", "Year", "Grade"]], body: educationArray.map((edu) => [ edu.qualification, edu.institute, edu.board, edu.year, edu.grade, ]), theme: "grid", styles: { fontSize: 10 }, margin: { left: 10, right: 10 }, });
 
-  const headers = ["Qualification", "Institute", "University", "Year", "Grade"];
-  const rows = data.education.split("\\n").map(line => line.split("|"));
-  doc.setFontSize(10);
-  headers.forEach((h, i) => doc.text(h, 10 + i * 40, y));
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  rows.forEach(row => {
-    row.forEach((cell, i) => doc.text(cell.trim(), 10 + i * 40, y));
-    y += 6;
-  });
-  y += 4;
+y = doc.lastAutoTable.finalY + 10;
 
-  section("Other Qualification", data.otherQualifications);
-  section("SKILLS", data.skills);
-  section("Experience", data.experience);
-  section("Language Known", data.languages);
-  section("STRENGTHS", data.strengths);
-  section("Hobbies", data.hobbies);
-  section("Job Applied For", data.job);
+doc.setFont("helvetica", "bold"); doc.text("Other Qualifications", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(otherQualifications, 10, y);
 
-  doc.save(`${data.name.replace(/\\s+/g, '_')}_Resume.pdf`);
-});
+y += 10; doc.setFont("helvetica", "bold"); doc.text("Skills", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(skills, 10, y);
 
-// AI Skill Suggestions (DeepSeek)
-async function getSuggestionsFromDeepSeek(job, skills) {
-  const box = document.getElementById("suggestionsBox");
+y += 10; doc.setFont("helvetica", "bold"); doc.text("Experience", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(doc.splitTextToSize(experience, 180), 10, y); y += doc.getTextDimensions(experience).h + 10;
 
-  const localSuggestions = {
-    "java developer": [
-      "Learn Spring Boot and Hibernate",
-      "Build REST APIs and host on GitHub",
-      "Contribute to open source Java projects",
-      "Get certified in Java SE 11"
-    ],
-    "frontend developer": [
-      "Master JavaScript and React or Vue",
-      "Practice responsive UI with CSS",
-      "Contribute to frontend GitHub projects",
-      "Use Figma to design mockups"
-    ],
-    "data analyst": [
-      "Learn Excel + SQL thoroughly",
-      "Practice with Pandas and Matplotlib",
-      "Build dashboards in Power BI or Tableau",
-      "Work on Kaggle datasets"
-    ],
-    "microsoft": [
-      "Brush up on C#, .NET or Azure basics",
-      "Build LeetCode problem-solving skills",
-      "Prepare system design interviews",
-      "Have a GitHub portfolio with 2-3 projects"
+doc.setFont("helvetica", "bold"); doc.text("Languages Known", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(languages, 10, y);
+
+y += 10; doc.setFont("helvetica", "bold"); doc.text("Strengths", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(strengths, 10, y);
+
+y += 10; doc.setFont("helvetica", "bold"); doc.text("Hobbies", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(hobbies, 10, y);
+
+y += 10; doc.setFont("helvetica", "bold"); doc.text("Job Applied For", 10, y); y += 6; doc.setFont("helvetica", "normal"); doc.text(job, 10, y);
+
+doc.save("resume.pdf");
+
+// 🧠 DeepSeek Suggestion Integration suggestionsBox.innerHTML = "<em>Loading suggestions...</em>"; try { const prompt = The user is applying for the job role: ${job}.\n\nHere is their background:\nSkills: ${skills}\nEducation: ${educationArray.map(e => e.qualification).join(", ")}\nExperience: ${experience}\nStrengths: ${strengths}.\n\nSuggest career tips and what to learn to increase chances.;
+
+const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: "Bearer YOUR_DEEPSEEK_API_KEY"
+  },
+  body: JSON.stringify({
+    model: "deepseek-chat",
+    messages: [
+      { role: "system", content: "You are a helpful AI career assistant." },
+      { role: "user", content: prompt }
     ]
-  };
+  })
+});
 
-  const jobKey = job.toLowerCase().trim();
-  const list = localSuggestions[jobKey] || [
-    "Improve your GitHub portfolio",
-    "Learn job-specific tools",
-    "Get certified or take a course",
-    "Practice interview questions"
-  ];
+const result = await response.json();
+const suggestion = result.choices?.[0]?.message?.content || "No suggestion generated.";
+suggestionsBox.innerHTML = `<h3>💡 Career Suggestions</h3><p>${suggestion}</p>`;
 
-  // Show locally
-  box.innerHTML = `
-    <h3>🧠 Career Suggestions</h3>
-    <ul>${list.map(item => `<li>✅ ${item}</li>`).join("")}</ul>
-  `;
+} catch (error) { console.error("Suggestion error:", error); suggestionsBox.innerHTML = "<strong>Suggestion error:</strong> Unable to get response from DeepSeek."; } });
 
-  // Still try DeepSeek if online
-  try {
-    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer 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",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          {
-            role: "system",
-            content: "You are a career advisor. Give skills, projects, and learning suggestions based on job title and skill set."
-          },
-          {
-            role: "user",
-            content: `I'm applying for ${job}. My skills: ${skills}. Suggest improvements.`
-          }
-        ]
-      })
-    });
-
-    const data = await res.json();
-    const content = data.choices?.[0]?.message?.content;
-    if (content) {
-      box.innerHTML = `<h3>🧠 DeepSeek Suggestions</h3><p>${content.replace(/\\n/g, '<br>')}</p>`;
-    }
-  } catch (e) {
-    console.warn("DeepSeek fallback used. Local suggestions shown.");
-  }
-}
