@@ -1,246 +1,171 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    /**
-     * Main object to encapsulate all functionality for the Resume Builder.
-     */
     const ResumeBuilder = {
         
-        // Configuration for selectors and default texts
-        config: {
-            form: '#resume-form',
-            liveUpdateSelector: '.live-update',
-            educationCheckboxSelector: 'input[name="education"]',
-            pdfButton: '#pdf-btn',
-            placeholders: {
-                name: 'Your Name',
-                email: 'your.email@example.com',
-                phone: 'Your Phone Number',
-                address: 'Your City, State',
-                skills: 'Your skills will appear here.',
-                experience: 'Your work experience will appear here.',
-                education: '<li>Your education details will appear here.</li>'
-            }
-        },
-
-        // Object to hold cached DOM elements
-        elements: {},
-
-        /**
-         * Initializes the application.
-         */
         init() {
             this.cacheDOMElements();
             this.bindEvents();
-            this.updatePreview(); // Initial update to set default placeholders
+            this.updatePreview();
         },
 
-        /**
-         * Caches all required DOM elements for better performance.
-         */
         cacheDOMElements() {
-            this.elements.form = document.querySelector(this.config.form);
-            this.elements.pdfBtn = document.querySelector(this.config.pdfButton);
-            this.elements.btnText = this.elements.pdfBtn.querySelector('.btn-text');
-            this.elements.spinner = this.elements.pdfBtn.querySelector('.spinner');
-            
-            // Cache all preview elements
-            this.elements.preview = {};
-            const previewElements = document.querySelectorAll('[id^="preview-"]');
-            previewElements.forEach(el => {
-                const key = el.id.split('-')[1];
-                this.elements.preview[key] = el;
+            this.form = document.getElementById('resume-form');
+            this.pdfBtn = document.getElementById('pdf-btn');
+            this.addEducationBtn = document.getElementById('add-education-btn');
+            this.educationEntries = document.getElementById('education-entries');
+            this.preview = {
+                name: document.getElementById('preview-name'),
+                contact: document.getElementById('preview-contact'),
+                education: document.getElementById('preview-education'),
+                skills: document.getElementById('preview-skills'),
+                experience: document.getElementById('preview-experience'),
+                strengths: document.getElementById('preview-strengths'),
+                hobbies: document.getElementById('preview-hobbies')
+            };
+        },
+
+        bindEvents() {
+            this.form.addEventListener('input', this.updatePreview.bind(this));
+            this.pdfBtn.addEventListener('click', this.generatePDF.bind(this));
+            this.addEducationBtn.addEventListener('click', this.addEducationEntry.bind(this));
+            this.educationEntries.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-btn')) {
+                    e.target.closest('.education-entry').remove();
+                    this.updatePreview();
+                }
             });
         },
 
-        /**
-         * Binds all necessary event listeners.
-         */
-        bindEvents() {
-            // Use event delegation for form inputs for efficiency
-            this.elements.form.addEventListener('input', this.handleFormUpdate.bind(this));
-            this.elements.form.addEventListener('change', this.handleFormUpdate.bind(this));
-            
-            this.elements.pdfBtn.addEventListener('click', this.generatePDF.bind(this));
-        },
-
-        /**
-         * Handles input and change events on the form to trigger a preview update.
-         */
-        handleFormUpdate(event) {
-            // Check if the target element should trigger a live update
-            if (event.target.matches(this.config.liveUpdateSelector) || event.target.matches(this.config.educationCheckboxSelector)) {
-                this.updatePreview();
-            }
-
-            // Toggle visibility for grade inputs when a checkbox changes
-            if (event.target.matches(this.config.educationCheckboxSelector)) {
-                const gradeInput = document.querySelector(`.edu-grade[data-for="${event.target.value}"]`);
-                if (gradeInput) {
-                    gradeInput.classList.toggle('hidden', !event.target.checked);
-                    if (!event.target.checked) {
-                        gradeInput.value = '';
-                    }
-                }
-            }
-        },
-
-        /**
-         * Gathers all values from the form fields.
-         * @returns {object} An object containing all form data.
-         */
         getFormValues() {
             const values = {};
-            const formData = new FormData(this.elements.form);
-            for (const [key, value] of formData.entries()) {
-                values[key] = value.trim();
-            }
-            
-            // Manually add education data since it's checkbox-based
-            values.education = [];
-            document.querySelectorAll('input[name="education"]:checked').forEach(cb => {
-                const gradeInput = document.querySelector(`.edu-grade[data-for="${cb.value}"]`);
-                values.education.push({
-                    degree: cb.value,
-                    grade: gradeInput.value.trim() || 'N/A'
-                });
+            const formElements = this.form.elements;
+            ['name', 'email', 'phone', 'address', 'skills', 'experience', 'strengths', 'hobbies'].forEach(id => {
+                values[id] = formElements[id].value.trim();
             });
 
+            values.education = Array.from(document.querySelectorAll('.education-entry')).map(entry => ({
+                qualification: entry.querySelector('[name="qualification"]').value,
+                institute: entry.querySelector('[name="institute"]').value,
+                board: entry.querySelector('[name="board"]').value,
+                year: entry.querySelector('[name="year"]').value,
+                grade: entry.querySelector('[name="grade"]').value,
+            }));
             return values;
         },
 
-        /**
-         * Updates the entire live preview panel with current form data.
-         */
         updatePreview() {
             const values = this.getFormValues();
             
-            this.elements.preview.name.innerText = values.name || this.config.placeholders.name;
-            this.elements.preview.email.innerText = values.email || this.config.placeholders.email;
-            this.elements.preview.phone.innerText = values.phone || this.config.placeholders.phone;
-            this.elements.preview.address.innerText = values.address || this.config.placeholders.address;
-            this.elements.preview.skills.innerText = values.skills || this.config.placeholders.skills;
-            this.elements.preview.experience.innerText = values.experience || this.config.placeholders.experience;
+            this.preview.name.innerText = values.name || 'Your Name';
+            this.preview.contact.innerText = [values.address, values.phone, values.email].filter(Boolean).join('\n');
             
-            // Update education section
-            if (values.education.length === 0) {
-                this.elements.preview.education.innerHTML = this.config.placeholders.education;
-            } else {
-                this.elements.preview.education.innerHTML = values.education
-                    .map(edu => `<li><strong>${edu.degree}:</strong> ${edu.grade}</li>`)
-                    .join('');
-            }
-        },
+            const createList = (text) => text.split('\n').filter(Boolean).map(item => `<li>${item}</li>`).join('');
 
-        /**
-         * Generates and downloads the resume as a PDF file.
-         */
-        generatePDF() {
-            this.setLoadingState(true);
+            ['skills', 'experience', 'strengths', 'hobbies'].forEach(key => {
+                if (values[key]) {
+                    this.preview[key].innerHTML = `<h4>${key.toUpperCase()}</h4><ul>${createList(values[key])}</ul>`;
+                } else {
+                    this.preview[key].innerHTML = `<h4>${key.toUpperCase()}</h4><p class="placeholder-text">Your ${key} will appear here.</p>`;
+                }
+            });
 
-            try {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-                const values = this.getFormValues();
-                
-                const leftMargin = 20;
-                const rightMargin = 210 - leftMargin;
-                let y = 20; // Y-position cursor
-
-                // --- Set Document Properties ---
-                doc.setProperties({
-                    title: `Resume - ${values.name || 'User'}`,
-                    subject: 'Resume created with Live Resume Builder.',
-                    author: 'Live Resume Builder',
+            if (values.education.length > 0) {
+                let tableHTML = `<table class="preview-education-table"><thead><tr><th>Qualification</th><th>Institute</th><th>Board</th><th>Year</th><th>Grade</th></tr></thead><tbody>`;
+                values.education.forEach(edu => {
+                    tableHTML += `<tr><td>${edu.qualification}</td><td>${edu.institute}</td><td>${edu.board}</td><td>${edu.year}</td><td>${edu.grade}</td></tr>`;
                 });
-
-                // --- PDF Header ---
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(26);
-                doc.text(values.name || this.config.placeholders.name, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-                y += 8;
-                
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(11);
-                const contactInfo = [values.email, values.phone, values.address].filter(Boolean).join(' | ');
-                doc.text(contactInfo, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-                y += 10;
-                doc.setDrawColor(226, 232, 240); // --border-color
-                doc.line(leftMargin, y, rightMargin, y);
-                y += 12;
-
-                // --- Section Helper ---
-                const addSection = (title, content) => {
-                    if (content && content.trim()) {
-                        doc.setFontSize(16);
-                        doc.setFont('helvetica', 'bold');
-                        doc.text(title, leftMargin, y);
-                        y += 8;
-                        doc.setFontSize(11);
-                        doc.setFont('helvetica', 'normal');
-                        const splitContent = doc.splitTextToSize(content, rightMargin - leftMargin);
-                        doc.text(splitContent, leftMargin, y);
-                        y += (splitContent.length * 5) + 10; // Adjust spacing after section
-                    }
-                };
-
-                // --- Add Content Sections ---
-                addSection("Professional Experience", values.experience);
-                addSection("Skills", values.skills);
-                
-                // --- Education Table Section ---
-                if (values.education.length > 0) {
-                    doc.setFontSize(16);
-                    doc.setFont('helvetica', 'bold');
-                    doc.text("Education", leftMargin, y);
-                    y += 8;
-
-                    const eduData = values.education.map(edu => [edu.degree, edu.grade]);
-                    doc.autoTable({
-                        startY: y,
-                        head: [['Qualification', 'Percentage/CGPA']],
-                        body: eduData,
-                        theme: 'grid',
-                        headStyles: { fillColor: [0, 92, 153] }, // --primary-color
-                        margin: { left: leftMargin },
-                        tableWidth: rightMargin - leftMargin,
-                    });
-                    y = doc.autoTable.previous.finalY + 10;
-                }
-                
-                // --- PDF Footer ---
-                const pageCount = doc.internal.getNumberOfPages();
-                for(let i = 1; i <= pageCount; i++) {
-                    doc.setPage(i);
-                    doc.setFontSize(9);
-                    doc.setFont('helvetica', 'italic');
-                    const date = new Date().toLocaleDateString('en-IN', { timeZone: 'Asia/Kolkata' });
-                    const footerText = `Generated on ${date} | Page ${i} of ${pageCount}`;
-                    doc.text(footerText, doc.internal.pageSize.getWidth() / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
-                }
-
-                // --- Save the PDF ---
-                const filename = (values.name || 'resume').replace(/\s+/g, '-').toLowerCase();
-                doc.save(`${filename}.pdf`);
-
-            } catch (error) {
-                console.error("Failed to generate PDF:", error);
-                alert("Sorry, there was an error generating the PDF. Please check the console for details.");
-            } finally {
-                this.setLoadingState(false);
+                tableHTML += `</tbody></table>`;
+                this.preview.education.innerHTML = tableHTML;
+            } else {
+                this.preview.education.innerHTML = `<p class="placeholder-text">Your education will appear here.</p>`;
             }
         },
 
-        /**
-         * Toggles the loading state of the PDF button.
-         * @param {boolean} isLoading - Whether to show the loading state.
-         */
-        setLoadingState(isLoading) {
-            this.elements.pdfBtn.disabled = isLoading;
-            this.elements.btnText.classList.toggle('hidden', isLoading);
-            this.elements.spinner.classList.toggle('hidden', !isLoading);
+        addEducationEntry() {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'education-entry';
+            entryDiv.innerHTML = `
+                <input type="text" name="qualification" placeholder="Qualification (e.g., B.Com)">
+                <input type="text" name="institute" placeholder="Institute Name">
+                <input type="text" name="board" placeholder="University / Board">
+                <input type="text" name="year" placeholder="Year of Passing">
+                <input type="text" name="grade" placeholder="Grade / Percentage">
+                <button type="button" class="remove-btn">Remove</button>
+            `;
+            this.educationEntries.appendChild(entryDiv);
+        },
+
+        generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            const values = this.getFormValues();
+
+            const leftMargin = 15, rightMargin = 210 - 15;
+            let y = 20;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text("RESUME", doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+            y += 15;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(24);
+            doc.text(values.name, leftMargin, y);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            const contactInfo = [values.address, `WhatsApp No: ${values.phone}`, `Email: ${values.email}`].filter(Boolean).join('\n');
+            doc.text(contactInfo, rightMargin, y, { align: 'right' });
+            y += 15;
+
+            const addSection = (title, content) => {
+                if (content && content.trim()) {
+                    doc.setFontSize(12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(title.toUpperCase(), leftMargin, y);
+                    doc.line(leftMargin, y + 1, rightMargin, y + 1);
+                    y += 8;
+                    
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    const items = content.split('\n').filter(Boolean);
+                    items.forEach(item => {
+                        const splitItem = doc.splitTextToSize(`• ${item}`, rightMargin - leftMargin - 5);
+                        doc.text(splitItem, leftMargin, y);
+                        y += (splitItem.length * 4) + 2;
+                    });
+                    y += 5;
+                }
+            };
+            
+            if (values.education.length > 0) {
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.text("EDUCATION", leftMargin, y);
+                doc.line(leftMargin, y + 1, rightMargin, y + 1);
+                y += 8;
+
+                const head = [['Qualification', 'Institute', 'University/Board', 'Year', 'Grade']];
+                const body = values.education.map(edu => [edu.qualification, edu.institute, edu.board, edu.year, edu.grade]);
+                
+                doc.autoTable({
+                    startY: y, head: head, body: body,
+                    headStyles: { fillColor: [51, 51, 51], textColor: 255 },
+                    theme: 'grid',
+                    margin: { left: leftMargin },
+                    tableWidth: rightMargin - leftMargin,
+                });
+                y = doc.autoTable.previous.finalY + 10;
+            }
+
+            addSection("Skills", values.skills);
+            addSection("Experience", values.experience);
+            addSection("Strengths", values.strengths);
+            addSection("Hobbies", values.hobbies);
+
+            doc.save(`${values.name.replace(/\s+/g, '-') || 'resume'}.pdf`);
         }
     };
 
-    // Start the application
     ResumeBuilder.init();
 });
