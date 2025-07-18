@@ -1,4 +1,4 @@
-// ======= Elements =======
+// ========== Element Selectors ==========
 const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const phoneInput = document.getElementById("phone");
@@ -19,57 +19,37 @@ const previewHobbies = document.getElementById("preview-hobbies");
 const addEducationBtn = document.getElementById("add-education-btn");
 const educationEntries = document.getElementById("education-entries");
 
-// ======= Live Updates =======
+// ========== Live Update Preview ==========
 function updatePreview() {
   previewName.textContent = nameInput.value || "Your Name";
   previewContact.textContent =
-    `${emailInput.value || ""} ${phoneInput.value || ""} ${addressInput.value || ""}`.trim();
+    `${emailInput.value || ""} | ${phoneInput.value || ""} | ${addressInput.value || ""}`.trim();
 
-  const skills = skillsInput.value.trim().split("\n").filter(Boolean);
-  previewSkills.innerHTML = skills.length
-    ? `<ul>${skills.map(s => `<li>${s}</li>`).join("")}</ul>`
-    : `<p class="placeholder-text">Your skills will appear here.</p>`;
-
-  const exp = experienceInput.value.trim().split("\n").filter(Boolean);
-  previewExperience.innerHTML = exp.length
-    ? `<ul>${exp.map(e => `<li>${e}</li>`).join("")}</ul>`
-    : `<p class="placeholder-text">Your experience will appear here.</p>`;
-
-  const str = strengthsInput.value.trim().split("\n").filter(Boolean);
-  previewStrengths.innerHTML = str.length
-    ? `<ul>${str.map(s => `<li>${s}</li>`).join("")}</ul>`
-    : `<p class="placeholder-text">Your strengths will appear here.</p>`;
-
-  const hob = hobbiesInput.value.trim().split("\n").filter(Boolean);
-  previewHobbies.innerHTML = hob.length
-    ? `<ul>${hob.map(h => `<li>${h}</li>`).join("")}</ul>`
-    : `<p class="placeholder-text">Your hobbies will appear here.</p>`;
+  previewSkills.innerHTML = formatList(skillsInput.value, "Your skills will appear here.");
+  previewExperience.innerHTML = formatList(experienceInput.value, "Your experience will appear here.");
+  previewStrengths.innerHTML = formatList(strengthsInput.value, "Your strengths will appear here.");
+  previewHobbies.innerHTML = formatList(hobbiesInput.value, "Your hobbies will appear here.");
 }
 
-// Attach live update listeners
+function formatList(text, placeholder) {
+  const items = text.trim().split("\n").filter(Boolean);
+  return items.length ? `<ul>${items.map(item => `<li>${item}</li>`).join("")}</ul>` : `<p class="placeholder-text">${placeholder}</p>`;
+}
+
 document.querySelectorAll(".live-update").forEach(input =>
   input.addEventListener("input", updatePreview)
 );
 
-// ======= Education Entries =======
+// ========== Education Section ==========
 function createEducationEntry() {
   const container = document.createElement("div");
   container.className = "edu-entry";
   container.style.marginBottom = "1rem";
 
-  const degree = document.createElement("input");
-  degree.placeholder = "Degree (e.g. BTech)";
-  degree.className = "edu-degree";
-  degree.style.marginRight = "5px";
-
-  const college = document.createElement("input");
-  college.placeholder = "Institute Name";
-  college.className = "edu-college";
-  college.style.marginRight = "5px";
-
-  const score = document.createElement("input");
-  score.placeholder = "CGPA or %";
-  score.className = "edu-score";
+  const degree = createInput("Degree (e.g. BTech)", "edu-degree");
+  const college = createInput("Institute Name", "edu-college");
+  const year = createInput("Year", "edu-year");
+  const score = createInput("CGPA or %", "edu-score");
 
   const remove = document.createElement("button");
   remove.innerText = "❌";
@@ -79,15 +59,22 @@ function createEducationEntry() {
     renderEducation();
   });
 
-  [degree, college, score].forEach(input =>
+  [degree, college, year, score].forEach(input =>
     input.addEventListener("input", renderEducation)
   );
 
-  container.append(degree, college, score, remove);
+  container.append(degree, college, year, score, remove);
   educationEntries.appendChild(container);
 }
 
-// Render all education entries to preview
+function createInput(placeholder, className) {
+  const input = document.createElement("input");
+  input.placeholder = placeholder;
+  input.className = className;
+  input.style.marginRight = "5px";
+  return input;
+}
+
 function renderEducation() {
   const entries = document.querySelectorAll(".edu-entry");
   if (!entries.length) {
@@ -98,8 +85,9 @@ function renderEducation() {
   const html = Array.from(entries).map(entry => {
     const degree = entry.querySelector(".edu-degree").value;
     const college = entry.querySelector(".edu-college").value;
+    const year = entry.querySelector(".edu-year").value;
     const score = entry.querySelector(".edu-score").value;
-    return `<p><strong>${degree}</strong> - ${college} (${score})</p>`;
+    return `<p><strong>${degree}</strong> - ${college} (${year}, ${score})</p>`;
   }).join("");
 
   previewEducation.innerHTML = html;
@@ -110,30 +98,65 @@ addEducationBtn.addEventListener("click", () => {
   renderEducation();
 });
 
-// ======= Theme Toggle =======
-document.getElementById("toggle-theme").addEventListener("click", () => {
-  document.body.classList.toggle("dark");
-});
-
-// ======= PDF Download =======
-document.getElementById("pdf-btn").addEventListener("click", async () => {
-  const btn = document.getElementById("pdf-btn");
-  const spinner = btn.querySelector(".spinner");
-  const text = btn.querySelector(".btn-text");
-
-  spinner?.classList.remove("hidden");
-  text?.classList.add("hidden");
+// ========== PDF Download ==========
+document.getElementById("pdf-btn").addEventListener("click", () => {
+  const resume = document.querySelector(".resume-paper");
+  if (!resume) return alert("Resume preview not found!");
 
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.text(`Resume - ${nameInput.value}`, 10, 10);
-  doc.html(document.querySelector(".resume-paper"), {
+  const pdf = new jsPDF("p", "pt", "a4");
+
+  pdf.html(resume, {
     callback: function (doc) {
-      doc.save(`${nameInput.value || "resume"}.pdf`);
-      spinner?.classList.add("hidden");
-      text?.classList.remove("hidden");
+      doc.save("resume.pdf");
     },
-    x: 10,
-    y: 20
+    x: 20,
+    y: 20,
+    html2canvas: {
+      scale: 1,
+      useCORS: true
+    }
   });
+});
+
+// ========== Clear Form ==========
+document.getElementById("clear-btn").addEventListener("click", () => {
+  if (confirm("Clear all form data?")) {
+    document.getElementById("resume-form").reset();
+    document.querySelectorAll(".edu-entry").forEach(e => e.remove());
+    updatePreview();
+    renderEducation();
+  }
+});
+
+// ========== Chatbot ==========
+async function sendChat() {
+  const input = document.getElementById("chat-input");
+  const messages = document.getElementById("chatbox-messages");
+  const userMsg = input.value.trim();
+  if (!userMsg) return;
+
+  messages.innerHTML += `<div><strong>You:</strong> ${userMsg}</div>`;
+  input.value = "...";
+
+  try {
+    const res = await fetch("http://localhost:5000/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userMsg })
+    });
+    const data = await res.json();
+    messages.innerHTML += `<div><strong>AI:</strong> ${data.reply}</div>`;
+    input.value = "";
+  } catch (err) {
+    messages.innerHTML += `<div><strong>AI:</strong> Error connecting to server.</div>`;
+    input.value = "";
+  }
+
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// ========== Theme Toggle ==========
+document.getElementById("toggle-theme").addEventListener("click", () => {
+  document.body.classList.toggle("dark");
 });
