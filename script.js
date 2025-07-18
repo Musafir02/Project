@@ -1,4 +1,4 @@
-// Updated script.js with autosave, theme toggle, PDF spinner, and better UX
+// script.js with resume builder logic + AI suggestions
 
 document.addEventListener('DOMContentLoaded', () => { const ResumeBuilder = { init() { this.cacheDOMElements(); this.bindEvents(); this.loadFromLocalStorage(); },
 
@@ -94,11 +94,11 @@ cacheDOMElements() {
         const entryDiv = document.createElement('div');
         entryDiv.className = 'education-entry';
         entryDiv.innerHTML = `
-            <input type="text" name="qualification" placeholder="Qualification (e.g., B.Com)" value="${entryData.qualification || ''}">
-            <input type="text" name="institute" placeholder="Institute Name" value="${entryData.institute || ''}">
-            <input type="text" name="board" placeholder="University / Board" value="${entryData.board || ''}">
-            <input type="text" name="year" placeholder="Year of Passing" value="${entryData.year || ''}">
-            <input type="text" name="grade" placeholder="Grade / Percentage" value="${entryData.grade || ''}">
+            <input type="text" name="qualification" placeholder="Qualification (e.g., B.Tech)" value="${entryData.qualification || ''}" />
+            <input type="text" name="institute" placeholder="Institute Name" value="${entryData.institute || ''}" />
+            <input type="text" name="board" placeholder="University / Board" value="${entryData.board || ''}" />
+            <input type="text" name="year" placeholder="Year of Passing" value="${entryData.year || ''}" />
+            <input type="text" name="grade" placeholder="Grade / Percentage" value="${entryData.grade || ''}" />
             <button type="button" class="remove-btn">Remove</button>
         `;
         this.educationEntries.appendChild(entryDiv);
