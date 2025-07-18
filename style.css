@@ -310,3 +310,53 @@ button:disabled {
   padding: 0.5rem 1rem;
   cursor: pointer;
 }
+@media screen and (max-width: 1024px) {
+  .main-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  #editor, #preview {
+    width: 100%;
+    padding: 1rem;
+  }
+
+  .resume-paper {
+    margin-top: 2rem;
+  }
+
+  #chatbox {
+    width: 90%;
+    bottom: 10px;
+    right: 5%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .resume-paper {
+    padding: 1.5rem;
+  }
+
+  .preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .preview-header h3 {
+    font-size: 1.4rem;
+  }
+
+  #chatbox {
+    font-size: 0.85rem;
+  }
+
+  #chatbox-input button {
+    padding: 0.4rem 0.8rem;
+  }
+
+  .theme-toggle {
+    font-size: 1rem;
+    top: 0.5rem;
+    right: 0.5rem;
+  }
+}
