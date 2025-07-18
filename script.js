@@ -126,13 +126,54 @@ downloadBtn.addEventListener("click", () => {
 // AI Skill Suggestions (DeepSeek)
 async function getSuggestionsFromDeepSeek(job, skills) {
   const box = document.getElementById("suggestionsBox");
-  box.innerHTML = "<p>⏳ Generating suggestions...</p>";
 
+  const localSuggestions = {
+    "java developer": [
+      "Learn Spring Boot and Hibernate",
+      "Build REST APIs and host on GitHub",
+      "Contribute to open source Java projects",
+      "Get certified in Java SE 11"
+    ],
+    "frontend developer": [
+      "Master JavaScript and React or Vue",
+      "Practice responsive UI with CSS",
+      "Contribute to frontend GitHub projects",
+      "Use Figma to design mockups"
+    ],
+    "data analyst": [
+      "Learn Excel + SQL thoroughly",
+      "Practice with Pandas and Matplotlib",
+      "Build dashboards in Power BI or Tableau",
+      "Work on Kaggle datasets"
+    ],
+    "microsoft": [
+      "Brush up on C#, .NET or Azure basics",
+      "Build LeetCode problem-solving skills",
+      "Prepare system design interviews",
+      "Have a GitHub portfolio with 2-3 projects"
+    ]
+  };
+
+  const jobKey = job.toLowerCase().trim();
+  const list = localSuggestions[jobKey] || [
+    "Improve your GitHub portfolio",
+    "Learn job-specific tools",
+    "Get certified or take a course",
+    "Practice interview questions"
+  ];
+
+  // Show locally
+  box.innerHTML = `
+    <h3>🧠 Career Suggestions</h3>
+    <ul>${list.map(item => `<li>✅ ${item}</li>`).join("")}</ul>
+  `;
+
+  // Still try DeepSeek if online
   try {
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": "Bearer YOUR_REAL_API_KEY",
+        "Authorization": "Bearer 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",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
@@ -140,21 +181,22 @@ async function getSuggestionsFromDeepSeek(job, skills) {
         messages: [
           {
             role: "system",
-            content: "You are a helpful career advisor that gives practical suggestions to improve resume and job readiness."
+            content: "You are a career advisor. Give skills, projects, and learning suggestions based on job title and skill set."
           },
           {
             role: "user",
-            content: `I'm applying for ${job}. My skills: ${skills}. What should I learn, build, or do to get hired?`
+            content: `I'm applying for ${job}. My skills: ${skills}. Suggest improvements.`
           }
         ]
       })
     });
 
-    const json = await res.json();
-    const msg = json.choices?.[0]?.message?.content || "No suggestion received.";
-    box.innerHTML = `<h3>🧠 Career Suggestions</h3><p>${msg.replace(/\\n/g, '<br>')}</p>`;
+    const data = await res.json();
+    const content = data.choices?.[0]?.message?.content;
+    if (content) {
+      box.innerHTML = `<h3>🧠 DeepSeek Suggestions</h3><p>${content.replace(/\\n/g, '<br>')}</p>`;
+    }
   } catch (e) {
-    console.error(e);
-    box.innerHTML = "<p>⚠️ Could not fetch suggestions. Check your API key or internet.</p>";
+    console.warn("DeepSeek fallback used. Local suggestions shown.");
   }
 }
