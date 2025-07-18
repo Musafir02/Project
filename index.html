@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Resume Maker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>📄 Smart Resume Maker</h1>
+    <p>Create your resume and get smart suggestions!</p>
+    <button id="themeToggle">🌗 Toggle Theme</button>
+  </header>  <main>
+    <section class="form-section">
+      <form id="resumeForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" required />
+        </div><div class="form-group">
+      <label for="dob">Date of Birth</label>
+      <input type="date" id="dob" required />
+    </div>
+
+    <div class="form-group">
+      <label for="education">Education</label>
+      <textarea id="education" required></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="skills">Skills (comma separated)</label>
+      <input type="text" id="skills" required />
+    </div>
+
+    <div class="form-group">
+      <label for="job">Job Role Applying For</label>
+      <input type="text" id="job" required />
+    </div>
+
+    <button type="submit">Generate Resume</button>
+  </form>
+</section>
+
+<section class="output-section">
+  <div id="resumePreview" class="resume-box"></div>
+  <div id="suggestionsBox" class="suggestion-box"></div>
+  <button id="downloadBtn" class="hidden">Download PDF</button>
+</section>
+
+  </main>  <footer>
+    <p>Made with ❤️ by Ibrahim</p>
+  </footer>  <script src="script.js"></script></body>
+</html>
