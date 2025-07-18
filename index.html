@@ -11,7 +11,8 @@
   <button id="toggle-theme" class="theme-toggle">🌙</button>
 
   <div class="main-container">
-    <div id="editor" class="column fade-in">
+    <!-- Resume Form -->
+    <div id="editor" class="column">
       <header>
         <h1>🚀 Smart Resume Builder</h1>
         <p>Build your resume professionally with AI tips.</p>
@@ -21,30 +22,31 @@
 
       <form id="resume-form">
         <fieldset>
-          <legend>👤 Personal Info</legend>
+          <legend><span>👤</span> Personal Info</legend>
           <input type="text" id="name" class="live-update" placeholder="Full Name" />
           <input type="email" id="email" class="live-update" placeholder="Email Address" />
-          <input type="tel" id="phone" class="live-update" placeholder="Phone (WhatsApp)" />
+          <input type="tel" id="phone" class="live-update" placeholder="Phone Number" />
           <textarea id="address" rows="2" class="live-update" placeholder="Full Address"></textarea>
         </fieldset>
 
         <fieldset>
           <legend>🎓 Education</legend>
           <div id="education-entries"></div>
-          <button type="button" id="add-education-btn" class="add-btn">➕ Add Education</button>
+          <button type="button" id="add-education-btn" class="add-btn">Add Education</button>
         </fieldset>
 
         <fieldset>
           <legend>💼 Professional</legend>
           <textarea id="skills" class="live-update" rows="3" placeholder="Skills (one per line)"></textarea>
-          <textarea id="experience" class="live-update" rows="3" placeholder="Experience (one per line)"></textarea>
+          <textarea id="experience" class="live-update" rows="4" placeholder="Experience (one per line)"></textarea>
           <textarea id="strengths" class="live-update" rows="2" placeholder="Your strengths"></textarea>
           <textarea id="hobbies" class="live-update" rows="2" placeholder="Hobbies / Interests"></textarea>
         </fieldset>
       </form>
     </div>
 
-    <div id="preview" class="column fade-in delay-1">
+    <!-- Resume Preview -->
+    <div id="preview" class="column">
       <div class="resume-paper">
         <h2 class="preview-title">RESUME</h2>
         <div class="preview-header">
@@ -82,8 +84,19 @@
     </div>
   </div>
 
+  <!-- AI Chatbot -->
+  <div id="chatbox">
+    <div id="chatbox-header">💡 AI Resume Coach</div>
+    <div id="chatbox-messages"></div>
+    <div id="chatbox-input">
+      <input type="text" id="chat-input" placeholder="e.g. Google SWE role" />
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
