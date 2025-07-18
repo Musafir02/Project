@@ -1,59 +1,72 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Resume Maker</title>
   <link rel="stylesheet" href="style.css" />
-</head><body>
-  <header class="header">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+  <div class="header">
     <h1>📄 Smart Resume Maker</h1>
     <p>Create your professional resume with ease!</p>
-  </header>  <main class="container">
-    <form id="resumeForm" class="form-section animate-fade-in">
-      <section class="card">
-        <h2>👤 Personal Info</h2>
-        <input type="text" placeholder="Full Name" id="fullName" required />
-        <input type="email" placeholder="Email" id="email" required />
-        <input type="tel" placeholder="WhatsApp No." id="phone" required />
-        <input type="text" placeholder="Address" id="address" required />
-      </section><section class="card">
-    <h2>👪 Family Details</h2>
-    <input type="text" placeholder="Father's Name" id="father" />
-    <input type="text" placeholder="Mother's Name" id="mother" />
-    <input type="text" placeholder="Sisters" id="sisters" />
-    <input type="text" placeholder="Marital Status" id="marital" />
-  </section>
+  </div>
 
-  <section class="card">
-    <h2>🎓 Education</h2>
-    <label><input type="checkbox" class="edu-check" value="SSC" /> SSC</label>
-    <label><input type="checkbox" class="edu-check" value="HSC" /> HSC</label>
-    <label><input type="checkbox" class="edu-check" value="B.Com" /> B.Com</label>
-    <label><input type="checkbox" class="edu-check" value="M.Com" /> M.Com</label>
-    <label><input type="checkbox" class="edu-check" value="DTL" /> DTL</label>
-    <div id="educationDetails"></div>
-  </section>
+  <div class="container">
+    <div class="card">
+      <h2>👤 Personal Information</h2>
+      <input type="text" id="name" placeholder="Full Name">
+      <input type="email" id="email" placeholder="Email">
+      <input type="tel" id="phone" placeholder="WhatsApp No.">
+      <input type="text" id="address" placeholder="Address">
+    </div>
 
-  <section class="card">
-    <h2>🛠️ Other Details</h2>
-    <input type="text" placeholder="Other Qualifications" id="otherQualifications" />
-    <input type="text" placeholder="Skills" id="skills" />
-    <input type="text" placeholder="Experience" id="experience" />
-    <input type="text" placeholder="Languages Known" id="languages" />
-    <input type="text" placeholder="Strengths" id="strengths" />
-    <input type="text" placeholder="Hobbies" id="hobbies" />
-    <input type="text" placeholder="Job Role Applying For" id="job" />
-  </section>
+    <div class="card">
+      <h2>👪 Family Details</h2>
+      <input type="text" id="father" placeholder="Father's Name">
+      <input type="text" id="mother" placeholder="Mother's Name">
+      <input type="text" id="sisters" placeholder="Sisters">
+      <input type="text" id="marital" placeholder="Marital Status">
+    </div>
 
-  <button type="submit" class="btn">Generate PDF Resume</button>
-</form>
+    <div class="card">
+      <h2>🎓 Education</h2>
+      <label><input type="checkbox" class="edu-check" value="SSC"> SSC</label>
+      <label><input type="checkbox" class="edu-check" value="HSC"> HSC</label>
+      <label><input type="checkbox" class="edu-check" value="B.Com"> B.Com</label>
+      <label><input type="checkbox" class="edu-check" value="M.Com"> M.Com</label>
+      <label><input type="checkbox" class="edu-check" value="DTL"> DTL</label>
+      <div id="education-details"></div>
+    </div>
 
-<section id="suggestions" class="output-section animate-fade-in">
-  <h2>🧠 Career Suggestions</h2>
-  <p id="suggestionOutput">Waiting for input...</p>
-</section>
+    <div class="card">
+      <h2>🛠️ Other Details</h2>
+      <input type="text" id="qualifications" placeholder="Other Qualifications">
+      <input type="text" id="skills" placeholder="Skills (e.g. Excel, PPT, Python)">
+      <input type="text" id="experience" placeholder="Experience">
+      <input type="text" id="languages" placeholder="Languages Known">
+      <input type="text" id="strengths" placeholder="Strengths">
+      <input type="text" id="hobbies" placeholder="Hobbies">
+      <input type="text" id="job" placeholder="Job Role Applying For">
+    </div>
 
-<button id="downloadBtn" class="btn hidden">📥 Download PDF</button>
+    <div class="card">
+      <h2>🧠 Career Suggestions</h2>
+      <div id="suggestions">No suggestions yet.</div>
+      <button class="btn" onclick="getSuggestions()">Generate Suggestions</button>
+    </div>
 
-  </main>  <footer>
-    <p>Made with ❤️ by Ibrahim</p>
-  </footer>  <script src="script.js"></script></body></html>
+    <div class="card">
+      <button class="btn" onclick="generatePDF()">Generate PDF Resume</button>
+    </div>
+
+    <footer>
+      Made with ❤️ by Ibrahim
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

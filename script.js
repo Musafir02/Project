@@ -1,130 +1,168 @@
-// script.js
-import jsPDF from "https://cdn.skypack.dev/jspdf";
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("resume-form");
+  const educationInputs = document.getElementById("education-inputs");
+  const suggestionOutput = document.getElementById("suggestions");
 
-const form = document.getElementById("resumeForm");
-const suggestionOutput = document.getElementById("suggestionOutput");
-const downloadBtn = document.getElementById("downloadBtn");
+  const educationOptions = ["SSC", "HSC", "B.Com", "M.Com", "DTL"];
 
-form.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  suggestionOutput.innerHTML = "<em>Loading suggestions...</em>";
-
-  const name = document.getElementById("fullName").value;
-  const email = document.getElementById("email").value;
-  const phone = document.getElementById("phone").value;
-  const address = document.getElementById("address").value;
-  const father = document.getElementById("father").value;
-  const mother = document.getElementById("mother").value;
-  const sisters = document.getElementById("sisters").value;
-  const marital = document.getElementById("marital").value;
-  const otherQualifications = document.getElementById("otherQualifications").value;
-  const skills = document.getElementById("skills").value;
-  const experience = document.getElementById("experience").value;
-  const languages = document.getElementById("languages").value;
-  const strengths = document.getElementById("strengths").value;
-  const hobbies = document.getElementById("hobbies").value;
-  const job = document.getElementById("job").value;
-
-  const selectedQuals = document.querySelectorAll(".edu-check:checked");
-  let educationArray = [];
-
-  selectedQuals.forEach((qual) => {
-    const q = qual.value;
-    const inst = document.querySelector(`[name='institute-${q}']`)?.value || "";
-    const board = document.querySelector(`[name='board-${q}']`)?.value || "";
-    const year = document.querySelector(`[name='year-${q}']`)?.value || "";
-    const grade = document.querySelector(`[name='grade-${q}']`)?.value || "";
-    educationArray.push({ qualification: q, institute: inst, board, year, grade });
+  // Dynamically add inputs when checkbox is selected
+  educationOptions.forEach(level => {
+    document.getElementById(level.toLowerCase()).addEventListener("change", function () {
+      const divId = `edu-${level.toLowerCase()}`;
+      let existing = document.getElementById(divId);
+      if (this.checked && !existing) {
+        const div = document.createElement("div");
+        div.id = divId;
+        div.className = "card";
+        div.innerHTML = `
+          <label>${level} Institute:</label>
+          <input type="text" name="${level}_institute">
+          <label>${level} Board:</label>
+          <input type="text" name="${level}_board">
+          <label>${level} Year:</label>
+          <input type="text" name="${level}_year">
+          <label>${level} Grade / %:</label>
+          <input type="text" name="${level}_grade">
+        `;
+        educationInputs.appendChild(div);
+      } else if (!this.checked && existing) {
+        existing.remove();
+      }
+    });
   });
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  let y = 10;
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  doc.setFontSize(16);
-  doc.setFont("helvetica", "bold");
-  doc.text("RESUME", 105, y, null, null, "center");
-  y += 10;
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key) => (data[key] = value));
 
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "bold");
-  doc.text(name, 10, y);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Email: ${email}`, 10, y + 6);
-  doc.text(`Phone: ${phone}`, 120, y + 6);
-  doc.text(`Address: ${address}`, 10, y + 12);
-
-  y += 26;
-  doc.setFont("helvetica", "bold");
-  doc.text("Family Details", 10, y);
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  doc.text(`Father's Name: ${father}`, 10, y);
-  y += 6;
-  doc.text(`Mother's Name: ${mother}`, 10, y);
-  y += 6;
-  doc.text(`Sisters: ${sisters}`, 10, y);
-  y += 6;
-  doc.text(`Marital Status: ${marital}`, 10, y);
-
-  y += 10;
-  doc.setFont("helvetica", "bold");
-  doc.text("Education", 10, y);
-  y += 6;
-  doc.autoTable({
-    startY: y,
-    head: [["Qualification", "Institute", "Board/University", "Year", "Grade"]],
-    body: educationArray.map(e => [e.qualification, e.institute, e.board, e.year, e.grade]),
-    theme: "grid",
-    margin: { left: 10, right: 10 },
-    styles: { fontSize: 10 }
-  });
-
-  y = doc.lastAutoTable.finalY + 10;
-  doc.setFont("helvetica", "bold");
-  doc.text("Other Details", 10, y);
-  y += 6;
-  doc.setFont("helvetica", "normal");
-  doc.text(`Other Qualifications: ${otherQualifications}`, 10, y);
-  y += 6;
-  doc.text(`Skills: ${skills}`, 10, y);
-  y += 6;
-  doc.text(`Experience: ${experience}`, 10, y);
-  y += 6;
-  doc.text(`Languages Known: ${languages}`, 10, y);
-  y += 6;
-  doc.text(`Strengths: ${strengths}`, 10, y);
-  y += 6;
-  doc.text(`Hobbies: ${hobbies}`, 10, y);
-  y += 10;
-  doc.text(`Job Applied For: ${job}`, 10, y);
-
-  doc.save("resume.pdf");
-  downloadBtn.classList.remove("hidden");
-
-  // Suggestion API (DeepSeek)
-  try {
-    const prompt = `The user is applying for ${job}. Skills: ${skills}. Education: ${educationArray.map(e => e.qualification).join(", ")}. Experience: ${experience}. Suggest improvements.`;
-
-    const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer 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"
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: [
-          { role: "system", content: "You are an expert career coach." },
-          { role: "user", content: prompt }
-        ]
-      })
+    // Gather education
+    data.education = educationOptions.filter(opt => form[opt.toLowerCase()].checked).map(opt => {
+      return {
+        level: opt,
+        institute: form[`${opt}_institute`]?.value || '',
+        board: form[`${opt}_board`]?.value || '',
+        year: form[`${opt}_year`]?.value || '',
+        grade: form[`${opt}_grade`]?.value || ''
+      };
     });
 
-    const data = await response.json();
-    const suggestion = data.choices?.[0]?.message?.content || "No suggestions found.";
-    suggestionOutput.innerHTML = `<div class='card animate-fade-in'><p>${suggestion}</p></div>`;
-  } catch (err) {
-    suggestionOutput.innerHTML = `<p style='color:red;'>❌ Failed to get suggestions from DeepSeek.</p>`;
-  }
+    // Generate PDF
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    let y = 10;
+
+    doc.setFontSize(18);
+    doc.text(`${data.name}'s Resume`, 10, y);
+    y += 10;
+    doc.setFontSize(12);
+    doc.text(`Email: ${data.email}`, 10, y);
+    doc.text(`Phone: ${data.phone}`, 130, y);
+    y += 10;
+    doc.text(`Address: ${data.address}`, 10, y);
+    y += 10;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Family Details:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`Father: ${data.father}`, 10, y);
+    doc.text(`Mother: ${data.mother}`, 70, y);
+    y += 7;
+    doc.text(`Sisters: ${data.sisters}`, 10, y);
+    doc.text(`Marital: ${data.marital}`, 70, y);
+    y += 10;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Education:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    data.education.forEach(ed => {
+      doc.text(`${ed.level}: ${ed.institute}, ${ed.board}, ${ed.year}, ${ed.grade}`, 10, y);
+      y += 7;
+    });
+
+    y += 5;
+    doc.setFont(undefined, "bold");
+    doc.text("Other Qualifications:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.otherQualifications}`, 10, y);
+    y += 7;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Skills:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.skills}`, 10, y);
+    y += 7;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Experience:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.experience}`, 10, y);
+    y += 7;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Languages Known:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.languages}`, 10, y);
+    y += 7;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Strengths:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.strengths}`, 10, y);
+    y += 7;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Hobbies:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.hobbies}`, 10, y);
+    y += 7;
+
+    doc.setFont(undefined, "bold");
+    doc.text("Job Applied For:", 10, y);
+    y += 7;
+    doc.setFont(undefined, "normal");
+    doc.text(`${data.job}`, 10, y);
+    y += 10;
+
+    doc.save("resume.pdf");
+
+    // Suggestions from OpenRouter API
+    suggestionOutput.innerText = "Thinking...";
+
+    const prompt = `Suggest what user should learn based on education: ${JSON.stringify(data.education)}, skills: ${data.skills}, experience: ${data.experience}, and job: ${data.job}`;
+
+    const headers = {
+      "Authorization": "Bearer <YOUR_OPENROUTER_API_KEY>",
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://musafir02.github.io/Project",
+      "X-Title": "Smart Resume Maker"
+    };
+
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          model: "openai/gpt-4o",
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      const result = await response.json();
+      const suggestion = result.choices?.[0]?.message?.content || "No suggestion found.";
+      suggestionOutput.innerText = suggestion;
+    } catch (err) {
+      suggestionOutput.innerText = "Failed to fetch suggestion.";
+    }
+  });
 });
