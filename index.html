@@ -1,141 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Resume Maker</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
-  <style>
-    body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #222; }
-    header, footer { background: #4f46e5; color: white; text-align: center; padding: 1rem; }
-    .form-section, .output-section { max-width: 900px; margin: auto; padding: 2rem; }
-    .form-group { margin-bottom: 1rem; }
-    label { display: block; font-weight: 600; margin-bottom: 0.3rem; }
-    input, textarea { width: 100%; padding: 0.6rem; font-size: 1rem; border-radius: 8px; border: 1px solid #ccc; }
-    button { background: #4f46e5; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 1rem; }
-    .resume-box, .suggestion-box { background: white; padding: 1.5rem; border-radius: 10px; margin-top: 1rem; box-shadow: 0 0 10px rgba(0,0,0,0.05); }
-    .qualification-details { display: none; margin-top: 1rem; border-left: 4px solid #4f46e5; padding-left: 1rem; }
-  </style>
-</head>
-<body>
-  <header>
+</head><body>
+  <header class="header">
     <h1>📄 Smart Resume Maker</h1>
-    <p>Create your professional resume and get smart job tips!</p>
-    <button id="themeToggle">🌗 Toggle Theme</button>
-  </header>
+    <p>Create your professional resume with ease!</p>
+  </header>  <main class="container">
+    <form id="resumeForm" class="form-section animate-fade-in">
+      <section class="card">
+        <h2>👤 Personal Info</h2>
+        <input type="text" placeholder="Full Name" id="fullName" required />
+        <input type="email" placeholder="Email" id="email" required />
+        <input type="tel" placeholder="WhatsApp No." id="phone" required />
+        <input type="text" placeholder="Address" id="address" required />
+      </section><section class="card">
+    <h2>👪 Family Details</h2>
+    <input type="text" placeholder="Father's Name" id="father" />
+    <input type="text" placeholder="Mother's Name" id="mother" />
+    <input type="text" placeholder="Sisters" id="sisters" />
+    <input type="text" placeholder="Marital Status" id="marital" />
+  </section>
 
-  <main>
-    <section class="form-section">
-      <form id="resumeForm">
-        <div class="form-group"><label for="name">Full Name</label><input type="text" id="name" required /></div>
-        <div class="form-group"><label for="email">Email</label><input type="email" id="email" required /></div>
-        <div class="form-group"><label for="phone">WhatsApp No.</label><input type="tel" id="phone" required /></div>
-        <div class="form-group"><label for="address">Address</label><textarea id="address" required></textarea></div>
+  <section class="card">
+    <h2>🎓 Education</h2>
+    <label><input type="checkbox" class="edu-check" value="SSC" /> SSC</label>
+    <label><input type="checkbox" class="edu-check" value="HSC" /> HSC</label>
+    <label><input type="checkbox" class="edu-check" value="B.Com" /> B.Com</label>
+    <label><input type="checkbox" class="edu-check" value="M.Com" /> M.Com</label>
+    <label><input type="checkbox" class="edu-check" value="DTL" /> DTL</label>
+    <div id="educationDetails"></div>
+  </section>
 
-        <h3>Family Details</h3>
-        <div class="form-group"><label for="father">Father's Name</label><input type="text" id="father" required /></div>
-        <div class="form-group"><label for="mother">Mother's Name</label><input type="text" id="mother" required /></div>
-        <div class="form-group"><label for="sisters">Sisters</label><input type="text" id="sisters" /></div>
-        <div class="form-group"><label for="marital">Marital Status</label><input type="text" id="marital" /></div>
+  <section class="card">
+    <h2>🛠️ Other Details</h2>
+    <input type="text" placeholder="Other Qualifications" id="otherQualifications" />
+    <input type="text" placeholder="Skills" id="skills" />
+    <input type="text" placeholder="Experience" id="experience" />
+    <input type="text" placeholder="Languages Known" id="languages" />
+    <input type="text" placeholder="Strengths" id="strengths" />
+    <input type="text" placeholder="Hobbies" id="hobbies" />
+    <input type="text" placeholder="Job Role Applying For" id="job" />
+  </section>
 
-        <h3>Education</h3>
-        <div class="form-group">
-          <label>Select Qualifications:</label>
-          <label><input type="checkbox" class="edu-check" value="SSC" /> SSC</label>
-          <label><input type="checkbox" class="edu-check" value="HSC" /> HSC</label>
-          <label><input type="checkbox" class="edu-check" value="B.Com" /> B.Com</label>
-          <label><input type="checkbox" class="edu-check" value="M.Com" /> M.Com</label>
-          <label><input type="checkbox" class="edu-check" value="DTL" /> DTL</label>
-        </div>
-        <div id="educationDetails"></div>
+  <button type="submit" class="btn">Generate PDF Resume</button>
+</form>
 
-        <h3>Other Qualifications</h3>
-        <div class="form-group"><input type="text" id="otherQualifications" required /></div>
-        <h3>Skills</h3>
-        <div class="form-group"><input type="text" id="skills" placeholder="e.g., Excel, Tally, PPT" required /></div>
-        <h3>Experience</h3>
-        <div class="form-group"><textarea id="experience" required></textarea></div>
-        <h3>Languages Known</h3>
-        <div class="form-group"><input type="text" id="languages" required /></div>
-        <h3>Strengths</h3>
-        <div class="form-group"><textarea id="strengths" required></textarea></div>
-        <h3>Hobbies</h3>
-        <div class="form-group"><textarea id="hobbies" required></textarea></div>
-        <div class="form-group"><label for="job">Job Role Applying For</label><input type="text" id="job" required /></div>
+<section id="suggestions" class="output-section animate-fade-in">
+  <h2>🧠 Career Suggestions</h2>
+  <p id="suggestionOutput">Waiting for input...</p>
+</section>
 
-        <button type="submit">Generate PDF Resume</button>
-      </form>
-    </section>
+<button id="downloadBtn" class="btn hidden">📥 Download PDF</button>
 
-    <section class="output-section">
-      <div id="resumePreview" class="resume-box"></div>
-      <div id="suggestionsBox" class="suggestion-box"></div>
-      <button id="downloadBtn" class="hidden">Download PDF</button>
-    </section>
-  </main>
-
-  <footer>
+  </main>  <footer>
     <p>Made with ❤️ by Ibrahim</p>
-  </footer>
-
-  <!-- Libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-  <script src="script.js"></script>
-
-  <!-- Education input logic -->
-  <script>
-    const educationDetails = document.getElementById("educationDetails");
-    document.querySelectorAll(".edu-check").forEach(check => {
-      check.addEventListener("change", () => {
-        const val = check.value;
-        const id = `edu-${val.replace(/\\W+/g, '')}`;
-        if (check.checked) {
-          const div = document.createElement("div");
-          div.className = "qualification-details";
-          div.id = id;
-          div.style.display = "block";
-          div.innerHTML = \`
-            <h4>\${val} Details</h4>
-            <label>Institute:</label><input type="text" name="institute-\${val}" required>
-            <label>Board/University:</label><input type="text" name="board-\${val}" required>
-            <label>Year:</label><input type="text" name="year-\${val}" required>
-            <label>Grade:</label><input type="text" name="grade-\${val}" required>
-          \`;
-          educationDetails.appendChild(div);
-        } else {
-          const existing = document.getElementById(id);
-          if (existing) educationDetails.removeChild(existing);
-        }
-      });
-    });
-  </script>
-</body>
-</html>
-<script>
-  const educationDetails = document.getElementById("educationDetails");
-  document.querySelectorAll(".edu-check").forEach(check => {
-    check.addEventListener("change", () => {
-      const val = check.value;
-      const id = `edu-${val.replace(/\W+/g, '')}`;
-      if (check.checked) {
-        const div = document.createElement("div");
-        div.className = "qualification-details";
-        div.id = id;
-        div.style.display = "block";
-        div.innerHTML = `
-          <h4>${val} Details</h4>
-          <label>Institute:</label><input type="text" name="institute-${val}" required>
-          <label>Board/University:</label><input type="text" name="board-${val}" required>
-          <label>Year:</label><input type="text" name="year-${val}" required>
-          <label>Grade:</label><input type="text" name="grade-${val}" required>
-        `;
-        educationDetails.appendChild(div);
-      } else {
-        const existing = document.getElementById(id);
-        if (existing) educationDetails.removeChild(existing);
-      }
-    });
-  });
-</script>
+  </footer>  <script src="script.js"></script></body></html>
