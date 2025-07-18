@@ -113,3 +113,29 @@
   </script>
 </body>
 </html>
+<script>
+  const educationDetails = document.getElementById("educationDetails");
+  document.querySelectorAll(".edu-check").forEach(check => {
+    check.addEventListener("change", () => {
+      const val = check.value;
+      const id = `edu-${val.replace(/\W+/g, '')}`;
+      if (check.checked) {
+        const div = document.createElement("div");
+        div.className = "qualification-details";
+        div.id = id;
+        div.style.display = "block";
+        div.innerHTML = `
+          <h4>${val} Details</h4>
+          <label>Institute:</label><input type="text" name="institute-${val}" required>
+          <label>Board/University:</label><input type="text" name="board-${val}" required>
+          <label>Year:</label><input type="text" name="year-${val}" required>
+          <label>Grade:</label><input type="text" name="grade-${val}" required>
+        `;
+        educationDetails.appendChild(div);
+      } else {
+        const existing = document.getElementById(id);
+        if (existing) educationDetails.removeChild(existing);
+      }
+    });
+  });
+</script>
