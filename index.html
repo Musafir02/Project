@@ -3,30 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Professional Resume Builder</title>
+  <title>Smart Resume Builder</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Tinos:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <button id="toggle-theme" class="theme-toggle" aria-label="Toggle Theme">🌙</button>
+  <button id="toggle-theme" class="theme-toggle">🌙</button>
 
   <div class="main-container">
-    <!-- 📝 Left Column (Form) -->
+    <!-- Resume Editor (Form) -->
     <div id="editor" class="column">
       <header>
-        <h1>Professional Resume Builder</h1>
-        <p>Enter your details for a clean, professional resume.</p>
-        <button type="button" id="pdf-btn">
-          <span class="btn-text">Download PDF</span>
-          <span class="spinner hidden"></span>
-        </button>
+        <h1>🚀 Smart Resume Builder</h1>
+        <p>Build your resume professionally with AI tips.</p>
+        <button type="button" id="pdf-btn">Download PDF</button>
       </header>
 
       <form id="resume-form">
         <fieldset>
-          <legend>👤 Personal Details</legend>
+          <legend>👤 Personal Info</legend>
           <label for="name">Full Name</label>
           <input type="text" id="name" class="live-update" />
 
@@ -37,7 +34,7 @@
           <input type="tel" id="phone" class="live-update" />
 
           <label for="address">Full Address</label>
-          <textarea id="address" rows="3" class="live-update"></textarea>
+          <textarea id="address" rows="2" class="live-update"></textarea>
         </fieldset>
 
         <fieldset>
@@ -49,27 +46,27 @@
         <fieldset>
           <legend>💼 Professional Details</legend>
           <label for="skills">Skills</label>
-          <textarea id="skills" rows="4" placeholder="Enter skills, one per line..." class="live-update"></textarea>
+          <textarea id="skills" rows="3" class="live-update" placeholder="Each skill on a new line"></textarea>
 
           <label for="experience">Experience</label>
-          <textarea id="experience" rows="6" placeholder="Describe work experience, one role per line..." class="live-update"></textarea>
+          <textarea id="experience" rows="4" class="live-update" placeholder="Job roles, each on a new line"></textarea>
 
           <label for="strengths">Strengths</label>
-          <textarea id="strengths" rows="3" placeholder="Enter strengths, one per line..." class="live-update"></textarea>
+          <textarea id="strengths" rows="2" class="live-update"></textarea>
 
           <label for="hobbies">Hobbies</label>
-          <textarea id="hobbies" rows="3" placeholder="Enter hobbies, one per line..." class="live-update"></textarea>
+          <textarea id="hobbies" rows="2" class="live-update"></textarea>
         </fieldset>
       </form>
     </div>
 
-    <!-- 📄 Right Column (Preview) -->
+    <!-- Resume Preview -->
     <div id="preview" class="column">
       <div class="resume-paper">
         <h2 class="preview-title">RESUME</h2>
         <div class="preview-header">
           <h3 id="preview-name">Your Name</h3>
-          <p id="preview-contact">Your Contact Info</p>
+          <p id="preview-contact">Contact Info</p>
         </div>
 
         <div class="preview-section">
@@ -102,12 +99,12 @@
     </div>
   </div>
 
-  <!-- 💬 AI Resume Coach Chatbox -->
+  <!-- 💬 AI Chat Box -->
   <div id="chatbox">
-    <div id="chatbox-header">AI Resume Coach</div>
+    <div id="chatbox-header">💡 AI Resume Coach</div>
     <div id="chatbox-messages"></div>
     <div id="chatbox-input">
-      <input type="text" id="chat-input" placeholder="Type job (e.g., Google SWE)" />
+      <input type="text" id="chat-input" placeholder="e.g. Google SWE" />
       <button onclick="sendChat()">Send</button>
     </div>
   </div>
@@ -123,7 +120,7 @@
       const userMsg = input.value.trim();
       if (!userMsg) return;
 
-      messages.innerHTML += `<div><b>You:</b> ${userMsg}</div>`;
+      messages.innerHTML += `<div><strong>You:</strong> ${userMsg}</div>`;
       input.value = "...";
 
       try {
@@ -132,15 +129,22 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: userMsg })
         });
-
         const data = await res.json();
-        messages.innerHTML += `<div><b>AI:</b> ${data.reply}</div>`;
+        messages.innerHTML += `<div><strong>AI:</strong> ${data.reply}</div>`;
         input.value = "";
       } catch (err) {
-        messages.innerHTML += `<div><b>AI:</b> Failed to fetch response.</div>`;
+        messages.innerHTML += `<div><strong>AI:</strong> Error connecting to server.</div>`;
         input.value = "";
       }
+
+      // Scroll to bottom
+      messages.scrollTop = messages.scrollHeight;
     }
+
+    // Optional: Theme toggle animation
+    document.getElementById("toggle-theme").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
   </script>
 </body>
 </html>

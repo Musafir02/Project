@@ -1,212 +1,139 @@
-// script.js with resume builder logic + AI suggestions
+// ======= Elements =======
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+const phoneInput = document.getElementById("phone");
+const addressInput = document.getElementById("address");
+const skillsInput = document.getElementById("skills");
+const experienceInput = document.getElementById("experience");
+const strengthsInput = document.getElementById("strengths");
+const hobbiesInput = document.getElementById("hobbies");
 
-document.addEventListener('DOMContentLoaded', () => { const ResumeBuilder = { init() { this.cacheDOMElements(); this.bindEvents(); this.loadFromLocalStorage(); },
+const previewName = document.getElementById("preview-name");
+const previewContact = document.getElementById("preview-contact");
+const previewEducation = document.getElementById("preview-education");
+const previewSkills = document.getElementById("preview-skills");
+const previewExperience = document.getElementById("preview-experience");
+const previewStrengths = document.getElementById("preview-strengths");
+const previewHobbies = document.getElementById("preview-hobbies");
 
-cacheDOMElements() {
-        this.form = document.getElementById('resume-form');
-        this.pdfBtn = document.getElementById('pdf-btn');
-        this.addEducationBtn = document.getElementById('add-education-btn');
-        this.educationEntries = document.getElementById('education-entries');
-        this.preview = {
-            name: document.getElementById('preview-name'),
-            contact: document.getElementById('preview-contact'),
-            education: document.getElementById('preview-education'),
-            skills: document.getElementById('preview-skills'),
-            experience: document.getElementById('preview-experience'),
-            strengths: document.getElementById('preview-strengths'),
-            hobbies: document.getElementById('preview-hobbies')
-        };
-    },
+const addEducationBtn = document.getElementById("add-education-btn");
+const educationEntries = document.getElementById("education-entries");
 
-    bindEvents() {
-        this.form.addEventListener('input', () => {
-            this.updatePreview();
-            this.saveToLocalStorage();
-        });
+// ======= Live Updates =======
+function updatePreview() {
+  previewName.textContent = nameInput.value || "Your Name";
+  previewContact.textContent =
+    `${emailInput.value || ""} ${phoneInput.value || ""} ${addressInput.value || ""}`.trim();
 
-        this.pdfBtn.addEventListener('click', () => {
-            this.generatePDF();
-        });
+  const skills = skillsInput.value.trim().split("\n").filter(Boolean);
+  previewSkills.innerHTML = skills.length
+    ? `<ul>${skills.map(s => `<li>${s}</li>`).join("")}</ul>`
+    : `<p class="placeholder-text">Your skills will appear here.</p>`;
 
-        this.addEducationBtn.addEventListener('click', () => {
-            this.addEducationEntry();
-        });
+  const exp = experienceInput.value.trim().split("\n").filter(Boolean);
+  previewExperience.innerHTML = exp.length
+    ? `<ul>${exp.map(e => `<li>${e}</li>`).join("")}</ul>`
+    : `<p class="placeholder-text">Your experience will appear here.</p>`;
 
-        this.educationEntries.addEventListener('click', (e) => {
-            if (e.target.classList.contains('remove-btn')) {
-                e.target.closest('.education-entry').remove();
-                this.updatePreview();
-                this.saveToLocalStorage();
-            }
-        });
+  const str = strengthsInput.value.trim().split("\n").filter(Boolean);
+  previewStrengths.innerHTML = str.length
+    ? `<ul>${str.map(s => `<li>${s}</li>`).join("")}</ul>`
+    : `<p class="placeholder-text">Your strengths will appear here.</p>`;
 
-        document.getElementById("toggle-theme").addEventListener("click", () => {
-            document.body.classList.toggle("dark");
-        });
-    },
+  const hob = hobbiesInput.value.trim().split("\n").filter(Boolean);
+  previewHobbies.innerHTML = hob.length
+    ? `<ul>${hob.map(h => `<li>${h}</li>`).join("")}</ul>`
+    : `<p class="placeholder-text">Your hobbies will appear here.</p>`;
+}
 
-    getFormValues() {
-        const values = {};
-        const formElements = this.form.elements;
-        ['name', 'email', 'phone', 'address', 'skills', 'experience', 'strengths', 'hobbies'].forEach(id => {
-            values[id] = formElements[id].value.trim();
-        });
+// Attach live update listeners
+document.querySelectorAll(".live-update").forEach(input =>
+  input.addEventListener("input", updatePreview)
+);
 
-        values.education = Array.from(document.querySelectorAll('.education-entry')).map(entry => ({
-            qualification: entry.querySelector('[name="qualification"]').value,
-            institute: entry.querySelector('[name="institute"]').value,
-            board: entry.querySelector('[name="board"]').value,
-            year: entry.querySelector('[name="year"]').value,
-            grade: entry.querySelector('[name="grade"]').value,
-        }));
-        return values;
-    },
+// ======= Education Entries =======
+function createEducationEntry() {
+  const container = document.createElement("div");
+  container.className = "edu-entry";
+  container.style.marginBottom = "1rem";
 
-    updatePreview() {
-        const values = this.getFormValues();
+  const degree = document.createElement("input");
+  degree.placeholder = "Degree (e.g. BTech)";
+  degree.className = "edu-degree";
+  degree.style.marginRight = "5px";
 
-        this.preview.name.innerText = values.name || 'Your Name';
-        this.preview.contact.innerText = [values.address, values.phone, values.email].filter(Boolean).join('\n');
+  const college = document.createElement("input");
+  college.placeholder = "Institute Name";
+  college.className = "edu-college";
+  college.style.marginRight = "5px";
 
-        const createList = (text) => text.split('\n').filter(Boolean).map(item => `<li>${item}</li>`).join('');
+  const score = document.createElement("input");
+  score.placeholder = "CGPA or %";
+  score.className = "edu-score";
 
-        ['skills', 'experience', 'strengths', 'hobbies'].forEach(key => {
-            if (values[key]) {
-                this.preview[key].innerHTML = `<h4>${key.toUpperCase()}</h4><ul>${createList(values[key])}</ul>`;
-            } else {
-                this.preview[key].innerHTML = `<h4>${key.toUpperCase()}</h4><p class="placeholder-text">Your ${key} will appear here.</p>`;
-            }
-        });
+  const remove = document.createElement("button");
+  remove.innerText = "❌";
+  remove.style.marginLeft = "8px";
+  remove.addEventListener("click", () => {
+    container.remove();
+    renderEducation();
+  });
 
-        if (values.education.length > 0) {
-            let tableHTML = `<table class="preview-education-table"><thead><tr><th>Qualification</th><th>Institute</th><th>Board</th><th>Year</th><th>Grade</th></tr></thead><tbody>`;
-            values.education.forEach(edu => {
-                tableHTML += `<tr><td>${edu.qualification}</td><td>${edu.institute}</td><td>${edu.board}</td><td>${edu.year}</td><td>${edu.grade}</td></tr>`;
-            });
-            tableHTML += `</tbody></table>`;
-            this.preview.education.innerHTML = tableHTML;
-        } else {
-            this.preview.education.innerHTML = `<p class="placeholder-text">Your education will appear here.</p>`;
-        }
-    },
+  [degree, college, score].forEach(input =>
+    input.addEventListener("input", renderEducation)
+  );
 
-    addEducationEntry(entryData = {}) {
-        const entryDiv = document.createElement('div');
-        entryDiv.className = 'education-entry';
-        entryDiv.innerHTML = `
-            <input type="text" name="qualification" placeholder="Qualification (e.g., B.Tech)" value="${entryData.qualification || ''}" />
-            <input type="text" name="institute" placeholder="Institute Name" value="${entryData.institute || ''}" />
-            <input type="text" name="board" placeholder="University / Board" value="${entryData.board || ''}" />
-            <input type="text" name="year" placeholder="Year of Passing" value="${entryData.year || ''}" />
-            <input type="text" name="grade" placeholder="Grade / Percentage" value="${entryData.grade || ''}" />
-            <button type="button" class="remove-btn">Remove</button>
-        `;
-        this.educationEntries.appendChild(entryDiv);
-    },
+  container.append(degree, college, score, remove);
+  educationEntries.appendChild(container);
+}
 
-    saveToLocalStorage() {
-        const values = this.getFormValues();
-        localStorage.setItem("resumeData", JSON.stringify(values));
-    },
+// Render all education entries to preview
+function renderEducation() {
+  const entries = document.querySelectorAll(".edu-entry");
+  if (!entries.length) {
+    previewEducation.innerHTML = `<p class="placeholder-text">Your education will appear here.</p>`;
+    return;
+  }
 
-    loadFromLocalStorage() {
-        const data = JSON.parse(localStorage.getItem("resumeData"));
-        if (!data) return;
+  const html = Array.from(entries).map(entry => {
+    const degree = entry.querySelector(".edu-degree").value;
+    const college = entry.querySelector(".edu-college").value;
+    const score = entry.querySelector(".edu-score").value;
+    return `<p><strong>${degree}</strong> - ${college} (${score})</p>`;
+  }).join("");
 
-        ['name', 'email', 'phone', 'address', 'skills', 'experience', 'strengths', 'hobbies'].forEach(id => {
-            this.form.elements[id].value = data[id] || '';
-        });
+  previewEducation.innerHTML = html;
+}
 
-        this.educationEntries.innerHTML = '';
-        (data.education || []).forEach(entry => {
-            this.addEducationEntry(entry);
-        });
-        this.updatePreview();
-    },
-
-    generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
-        const values = this.getFormValues();
-
-        this.pdfBtn.disabled = true;
-        this.pdfBtn.querySelector('.btn-text').classList.add('hidden');
-        this.pdfBtn.querySelector('.spinner').classList.remove('hidden');
-
-        const leftMargin = 15, rightMargin = 210 - 15;
-        let y = 20;
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        doc.text("RESUME", doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
-        y += 15;
-
-        doc.setFontSize(24);
-        doc.text(values.name, leftMargin, y);
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        const contactInfo = [values.address, `WhatsApp No: ${values.phone}`, `Email: ${values.email}`].filter(Boolean).join('\n');
-        doc.text(contactInfo, rightMargin, y, { align: 'right' });
-        y += 15;
-
-        const addSection = (title, content) => {
-            if (content && content.trim()) {
-                doc.setFontSize(12);
-                doc.setFont('helvetica', 'bold');
-                doc.text(title.toUpperCase(), leftMargin, y);
-                doc.line(leftMargin, y + 1, rightMargin, y + 1);
-                y += 8;
-
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(10);
-                const items = content.split('\n').filter(Boolean);
-                items.forEach(item => {
-                    const splitItem = doc.splitTextToSize(`• ${item}`, rightMargin - leftMargin - 5);
-                    doc.text(splitItem, leftMargin, y);
-                    y += (splitItem.length * 4) + 2;
-                });
-                y += 5;
-            }
-        };
-
-        if (values.education.length > 0) {
-            doc.setFontSize(12);
-            doc.setFont('helvetica', 'bold');
-            doc.text("EDUCATION", leftMargin, y);
-            doc.line(leftMargin, y + 1, rightMargin, y + 1);
-            y += 8;
-
-            const head = [['Qualification', 'Institute', 'University/Board', 'Year', 'Grade']];
-            const body = values.education.map(edu => [edu.qualification, edu.institute, edu.board, edu.year, edu.grade]);
-
-            doc.autoTable({
-                startY: y,
-                head: head,
-                body: body,
-                headStyles: { fillColor: [51, 51, 51], textColor: 255 },
-                theme: 'grid',
-                margin: { left: leftMargin },
-                tableWidth: rightMargin - leftMargin,
-            });
-            y = doc.autoTable.previous.finalY + 10;
-        }
-
-        addSection("Skills", values.skills);
-        addSection("Experience", values.experience);
-        addSection("Strengths", values.strengths);
-        addSection("Hobbies", values.hobbies);
-
-        setTimeout(() => {
-            doc.save(`${values.name.replace(/\s+/g, '-') || 'resume'}.pdf`);
-            this.pdfBtn.disabled = false;
-            this.pdfBtn.querySelector('.btn-text').classList.remove('hidden');
-            this.pdfBtn.querySelector('.spinner').classList.add('hidden');
-        }, 500);
-    }
-};
-
-ResumeBuilder.init();
-
+addEducationBtn.addEventListener("click", () => {
+  createEducationEntry();
+  renderEducation();
 });
 
+// ======= Theme Toggle =======
+document.getElementById("toggle-theme").addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+});
+
+// ======= PDF Download =======
+document.getElementById("pdf-btn").addEventListener("click", async () => {
+  const btn = document.getElementById("pdf-btn");
+  const spinner = btn.querySelector(".spinner");
+  const text = btn.querySelector(".btn-text");
+
+  spinner?.classList.remove("hidden");
+  text?.classList.add("hidden");
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.text(`Resume - ${nameInput.value}`, 10, 10);
+  doc.html(document.querySelector(".resume-paper"), {
+    callback: function (doc) {
+      doc.save(`${nameInput.value || "resume"}.pdf`);
+      spinner?.classList.add("hidden");
+      text?.classList.remove("hidden");
+    },
+    x: 10,
+    y: 20
+  });
+});
