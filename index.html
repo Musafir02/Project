@@ -1,72 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Resume Maker</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="header">
+  <header>
     <h1>📄 Smart Resume Maker</h1>
     <p>Create your professional resume with ease!</p>
-  </div>
+  </header>
+  <form id="resume-form">
+    <!-- Basic Details -->
+    <input placeholder="Full Name" id="name">
+    <input placeholder="Email" id="email">
+    <input placeholder="WhatsApp No." id="phone">
+    <input placeholder="Address" id="address">
 
-  <div class="container">
-    <div class="card">
-      <h2>👤 Personal Information</h2>
-      <input type="text" id="name" placeholder="Full Name">
-      <input type="email" id="email" placeholder="Email">
-      <input type="tel" id="phone" placeholder="WhatsApp No.">
-      <input type="text" id="address" placeholder="Address">
-    </div>
+    <!-- Family Details -->
+    <h2>Family Details</h2>
+    <input placeholder="Father's Name" id="father">
+    <input placeholder="Mother's Name" id="mother">
+    <input placeholder="Sisters" id="sisters">
+    <input placeholder="Marital Status" id="marital">
 
-    <div class="card">
-      <h2>👪 Family Details</h2>
-      <input type="text" id="father" placeholder="Father's Name">
-      <input type="text" id="mother" placeholder="Mother's Name">
-      <input type="text" id="sisters" placeholder="Sisters">
-      <input type="text" id="marital" placeholder="Marital Status">
-    </div>
-
-    <div class="card">
+    <!-- Education -->
+    <div id="education-section" class="card">
       <h2>🎓 Education</h2>
-      <label><input type="checkbox" class="edu-check" value="SSC"> SSC</label>
-      <label><input type="checkbox" class="edu-check" value="HSC"> HSC</label>
-      <label><input type="checkbox" class="edu-check" value="B.Com"> B.Com</label>
-      <label><input type="checkbox" class="edu-check" value="M.Com"> M.Com</label>
-      <label><input type="checkbox" class="edu-check" value="DTL"> DTL</label>
-      <div id="education-details"></div>
+      <div class="education-option">
+        <label><input type="checkbox" name="education" value="SSC"> SSC</label>
+        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="SSC">
+      </div>
+      <div class="education-option">
+        <label><input type="checkbox" name="education" value="HSC"> HSC</label>
+        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="HSC">
+      </div>
+      <div class="education-option">
+        <label><input type="checkbox" name="education" value="B.Com"> B.Com</label>
+        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="B.Com">
+      </div>
+      <div class="education-option">
+        <label><input type="checkbox" name="education" value="M.Com"> M.Com</label>
+        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="M.Com">
+      </div>
+      <div class="education-option">
+        <label><input type="checkbox" name="education" value="DTL"> DTL</label>
+        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="DTL">
+      </div>
     </div>
 
-    <div class="card">
-      <h2>🛠️ Other Details</h2>
-      <input type="text" id="qualifications" placeholder="Other Qualifications">
-      <input type="text" id="skills" placeholder="Skills (e.g. Excel, PPT, Python)">
-      <input type="text" id="experience" placeholder="Experience">
-      <input type="text" id="languages" placeholder="Languages Known">
-      <input type="text" id="strengths" placeholder="Strengths">
-      <input type="text" id="hobbies" placeholder="Hobbies">
-      <input type="text" id="job" placeholder="Job Role Applying For">
-    </div>
+    <!-- Other Details -->
+    <h2>🛠️ Other Details</h2>
+    <input placeholder="Other Qualifications" id="qualifications">
+    <input placeholder="Skills (e.g. Excel, Tally, PPT)" id="skills">
+    <input placeholder="Experience" id="experience">
+    <input placeholder="Languages Known" id="languages">
+    <input placeholder="Strengths" id="strengths">
+    <input placeholder="Hobbies" id="hobbies">
+    <input placeholder="Job Role Applying For" id="job">
 
+    <!-- Career Suggestions -->
     <div class="card">
       <h2>🧠 Career Suggestions</h2>
-      <div id="suggestions">No suggestions yet.</div>
-      <button class="btn" onclick="getSuggestions()">Generate Suggestions</button>
+      <p id="suggestions">No suggestions yet.</p>
+      <button type="button" onclick="generateSuggestions()">Generate Suggestions</button>
     </div>
 
-    <div class="card">
-      <button class="btn" onclick="generatePDF()">Generate PDF Resume</button>
-    </div>
-
-    <footer>
-      Made with ❤️ by Ibrahim
-    </footer>
-  </div>
-
+    <!-- PDF Button -->
+    <button type="button" onclick="generatePDF()">Generate PDF Resume</button>
+  </form>
+  <footer>
+    <p>Made with ❤️ by Ibrahim</p>
+  </footer>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>

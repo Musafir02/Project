@@ -1,168 +1,103 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("resume-form");
-  const educationInputs = document.getElementById("education-inputs");
-  const suggestionOutput = document.getElementById("suggestions");
+// script.js
 
-  const educationOptions = ["SSC", "HSC", "B.Com", "M.Com", "DTL"];
+function generateSuggestions() {
+  const job = document.getElementById("job").value;
+  const skills = document.getElementById("skills").value;
+  const experience = document.getElementById("experience").value;
 
-  // Dynamically add inputs when checkbox is selected
-  educationOptions.forEach(level => {
-    document.getElementById(level.toLowerCase()).addEventListener("change", function () {
-      const divId = `edu-${level.toLowerCase()}`;
-      let existing = document.getElementById(divId);
-      if (this.checked && !existing) {
-        const div = document.createElement("div");
-        div.id = divId;
-        div.className = "card";
-        div.innerHTML = `
-          <label>${level} Institute:</label>
-          <input type="text" name="${level}_institute">
-          <label>${level} Board:</label>
-          <input type="text" name="${level}_board">
-          <label>${level} Year:</label>
-          <input type="text" name="${level}_year">
-          <label>${level} Grade / %:</label>
-          <input type="text" name="${level}_grade">
-        `;
-        educationInputs.appendChild(div);
-      } else if (!this.checked && existing) {
-        existing.remove();
-      }
-    });
-  });
+  const prompt = `The user wants to apply for the job role '${job}' with skills '${skills}' and experience '${experience}'. Suggest 5 skills, certifications, or topics to learn to be more competitive.`;
 
-  form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+  document.getElementById("suggestions").innerText = "Generating suggestions...";
 
-    const formData = new FormData(form);
-    const data = {};
-    formData.forEach((value, key) => (data[key] = value));
-
-    // Gather education
-    data.education = educationOptions.filter(opt => form[opt.toLowerCase()].checked).map(opt => {
-      return {
-        level: opt,
-        institute: form[`${opt}_institute`]?.value || '',
-        board: form[`${opt}_board`]?.value || '',
-        year: form[`${opt}_year`]?.value || '',
-        grade: form[`${opt}_grade`]?.value || ''
-      };
-    });
-
-    // Generate PDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let y = 10;
-
-    doc.setFontSize(18);
-    doc.text(`${data.name}'s Resume`, 10, y);
-    y += 10;
-    doc.setFontSize(12);
-    doc.text(`Email: ${data.email}`, 10, y);
-    doc.text(`Phone: ${data.phone}`, 130, y);
-    y += 10;
-    doc.text(`Address: ${data.address}`, 10, y);
-    y += 10;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Family Details:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`Father: ${data.father}`, 10, y);
-    doc.text(`Mother: ${data.mother}`, 70, y);
-    y += 7;
-    doc.text(`Sisters: ${data.sisters}`, 10, y);
-    doc.text(`Marital: ${data.marital}`, 70, y);
-    y += 10;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Education:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    data.education.forEach(ed => {
-      doc.text(`${ed.level}: ${ed.institute}, ${ed.board}, ${ed.year}, ${ed.grade}`, 10, y);
-      y += 7;
-    });
-
-    y += 5;
-    doc.setFont(undefined, "bold");
-    doc.text("Other Qualifications:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.otherQualifications}`, 10, y);
-    y += 7;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Skills:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.skills}`, 10, y);
-    y += 7;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Experience:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.experience}`, 10, y);
-    y += 7;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Languages Known:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.languages}`, 10, y);
-    y += 7;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Strengths:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.strengths}`, 10, y);
-    y += 7;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Hobbies:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.hobbies}`, 10, y);
-    y += 7;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Job Applied For:", 10, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    doc.text(`${data.job}`, 10, y);
-    y += 10;
-
-    doc.save("resume.pdf");
-
-    // Suggestions from OpenRouter API
-    suggestionOutput.innerText = "Thinking...";
-
-    const prompt = `Suggest what user should learn based on education: ${JSON.stringify(data.education)}, skills: ${data.skills}, experience: ${data.experience}, and job: ${data.job}`;
-
-    const headers = {
-      "Authorization": "Bearer <YOUR_OPENROUTER_API_KEY>",
+  fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer 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",
       "Content-Type": "application/json",
       "HTTP-Referer": "https://musafir02.github.io/Project",
       "X-Title": "Smart Resume Maker"
-    };
+    },
+    body: JSON.stringify({
+      model: "openai/gpt-4o",
+      messages: [{ role: "user", content: prompt }]
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      const text = data.choices?.[0]?.message?.content || "No suggestions found.";
+      document.getElementById("suggestions").innerText = text;
+    })
+    .catch(() => {
+      document.getElementById("suggestions").innerText = "Failed to fetch suggestions.";
+    });
+}
 
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers,
-        body: JSON.stringify({
-          model: "openai/gpt-4o",
-          messages: [{ role: "user", content: prompt }]
-        })
-      });
+function generatePDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-      const result = await response.json();
-      const suggestion = result.choices?.[0]?.message?.content || "No suggestion found.";
-      suggestionOutput.innerText = suggestion;
-    } catch (err) {
-      suggestionOutput.innerText = "Failed to fetch suggestion.";
+  let y = 10;
+
+  function write(label, value) {
+    doc.setFont("helvetica", "bold");
+    doc.text(label, 10, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(value, 60, y);
+    y += 10;
+  }
+
+  write("Name:", document.getElementById("name").value);
+  write("Email:", document.getElementById("email").value);
+  write("Phone:", document.getElementById("phone").value);
+  write("Address:", document.getElementById("address").value);
+  write("Father:", document.getElementById("father").value);
+  write("Mother:", document.getElementById("mother").value);
+  write("Sisters:", document.getElementById("sisters").value);
+  write("Marital Status:", document.getElementById("marital").value);
+
+  // Education table
+  doc.setFont("helvetica", "bold");
+  doc.text("Education", 10, y);
+  y += 10;
+  const edu = collectEducationData();
+  doc.autoTable({
+    startY: y,
+    head: [["Qualification", "Percentage/CGPA"]],
+    body: edu.map(e => [e.degree, e.grade]),
+    theme: 'grid'
+  });
+  y = doc.previousAutoTable.finalY + 10;
+
+  write("Other Qualifications:", document.getElementById("qualifications").value);
+  write("Skills:", document.getElementById("skills").value);
+  write("Experience:", document.getElementById("experience").value);
+  write("Languages:", document.getElementById("languages").value);
+  write("Strengths:", document.getElementById("strengths").value);
+  write("Hobbies:", document.getElementById("hobbies").value);
+  write("Job Role:", document.getElementById("job").value);
+
+  doc.save("Resume.pdf");
+}
+
+function collectEducationData() {
+  const education = [];
+  document.querySelectorAll('input[name="education"]:checked').forEach((cb) => {
+    const grade = document.querySelector(`.edu-grade[data-for="${cb.value}"]`).value.trim();
+    education.push({ degree: cb.value, grade: grade || "N/A" });
+  });
+  return education;
+}
+
+// Toggle education grade inputs
+const educationCheckboxes = document.querySelectorAll('input[name="education"]');
+educationCheckboxes.forEach((checkbox) => {
+  checkbox.addEventListener("change", () => {
+    const gradeInput = document.querySelector(`.edu-grade[data-for="${checkbox.value}"]`);
+    if (checkbox.checked) {
+      gradeInput.classList.remove("hidden");
+    } else {
+      gradeInput.classList.add("hidden");
+      gradeInput.value = "";
     }
   });
 });
