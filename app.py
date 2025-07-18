@@ -1,40 +1,72 @@
-from flask import Flask, request, jsonify
-import openai
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
+from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
+import requests
+import json
 
 app = Flask(__name__)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+CORS(app)
 
-@app.route("/ask", methods=["POST"])
-def ask_ai():
+# === AI SETTINGS ===
+OPENROUTER_API_KEY = "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"
+OPENROUTER_MODEL = "deepseek-chat"
+
+# === HOME PAGE ===
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+# === AI CHATBOT ENDPOINT ===
+@app.route("/chat", methods=["POST"])
+def chat():
     data = request.get_json()
-    user_input = data.get("message", "").strip()
+    user_message = data.get("message", "")
 
-    if not user_input:
-        return jsonify({"reply": "Please provide a valid query."})
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "http://localhost:5000",  # 🔁 or your site URL
+        "X-Title": "Resume AI Career Coach"
+    }
 
-    prompt = f"You are a resume coach. Help a user who wants a job at: {user_input}. Suggest resume tips and skills they should include."
+    payload = {
+        "model": "deepseek/deepseek-r1:free",
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are an AI career coach. Help users improve skills for their desired job."
+            },
+            {
+                "role": "user",
+                "content": user_message
+            }
+        ]
+    }
 
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a helpful AI for resume improvement."},
-                {"role": "user", "content": prompt}
-            ]
-        )
-        reply = response.choices[0].message.content.strip()
-        return jsonify({"reply": reply})
-    except Exception as e:
-        print("AI Error:", e)
-        return jsonify({"reply": "Sorry, something went wrong."})
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions",
+                                 headers=headers,
+                                 data=json.dumps(payload))
+        data = response.json()
 
-@app.route("/health", methods=["GET"])
-def health():
-    return jsonify({"status": "ok"})
+        # ✅ Debug print
+        print("🔁 OpenRouter reply:", data)
+
+        if "choices" in data:
+            reply = data["choices"][0]["message"]["content"]
+            return jsonify({"reply": reply})
+        elif "error" in data:
+            return jsonify({"reply": f"⚠️ AI error: {data['error']['message']}"}), 500
+        else:
+            return jsonify({"reply": f"⚠️ Unexpected AI response: {data}"}), 500
+    except Exception as e:
+        return jsonify({"reply": f"⚠️ Exception: {str(e)}"}), 500
+
+# === PDF EXPORT TEST (Optional Future Use) ===
+@app.route("/generate", methods=["POST"])
+def generate():
+    data = request.get_json()
+    return jsonify({"message": "PDF generation logic goes here"})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

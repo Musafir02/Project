@@ -4,51 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Smart Resume Builder</title>
-  <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Local CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <!-- PDF helper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
+  <!-- Dark-mode toggle -->
   <button id="toggle-theme" class="theme-toggle">🌙</button>
 
   <div class="main-container">
-    <!-- Resume Form -->
+    <!-- ========== FORM ========== -->
     <div id="editor" class="column">
       <header>
         <h1>🚀 Smart Resume Builder</h1>
-        <p>Build your resume professionally with AI tips.</p>
+        <p>Build a professional resume &amp; get AI tips.</p>
         <button id="pdf-btn">📄 Download PDF</button>
         <button id="clear-btn" class="add-btn danger">🗑 Clear All</button>
       </header>
 
       <form id="resume-form">
+        <!-- Personal -->
         <fieldset>
-          <legend><span>👤</span> Personal Info</legend>
-          <input type="text" id="name" class="live-update" placeholder="Full Name" />
-          <input type="email" id="email" class="live-update" placeholder="Email Address" />
-          <input type="tel" id="phone" class="live-update" placeholder="Phone Number" />
-          <textarea id="address" rows="2" class="live-update" placeholder="Full Address"></textarea>
+          <legend>👤 Personal Info</legend>
+
+          <input type="text"     id="name"    class="live-update" placeholder="Full Name" />
+          <input type="email"    id="email"   class="live-update" placeholder="Email Address" />
+          <input type="tel"      id="phone"   class="live-update" placeholder="Phone Number" />
+          <textarea id="address" rows="2"     class="live-update" placeholder="Full Address"></textarea>
+
+          <label>Date of Birth:</label>
+          <input type="date" id="dob" class="live-update" />
+
+          <label>Gender:</label>
+          <label><input type="radio" name="gender" value="Male"   checked> Male</label>
+          <label><input type="radio" name="gender" value="Female"> Female</label>
+
+          <label>Marital Status:</label>
+          <label><input type="radio" name="marital" value="Married"   checked> Married</label>
+          <label><input type="radio" name="marital" value="Unmarried"> Unmarried</label>
         </fieldset>
 
+        <!-- Education -->
         <fieldset>
           <legend>🎓 Education</legend>
           <div id="education-entries"></div>
           <button type="button" id="add-education-btn" class="add-btn">Add Education</button>
         </fieldset>
 
+        <!-- Professional -->
         <fieldset>
           <legend>💼 Professional</legend>
-          <textarea id="skills" class="live-update" rows="3" placeholder="Skills (one per line)"></textarea>
+          <textarea id="skills"     class="live-update" rows="3" placeholder="Skills (one per line)"></textarea>
           <textarea id="experience" class="live-update" rows="4" placeholder="Experience (one per line)"></textarea>
-          <textarea id="strengths" class="live-update" rows="2" placeholder="Your strengths"></textarea>
-          <textarea id="hobbies" class="live-update" rows="2" placeholder="Hobbies / Interests"></textarea>
+          <textarea id="strengths"  class="live-update" rows="2" placeholder="Your strengths"></textarea>
+          <textarea id="hobbies"    class="live-update" rows="2" placeholder="Hobbies / Interests"></textarea>
         </fieldset>
       </form>
     </div>
 
-    <!-- Resume Preview -->
+    <!-- ========== PREVIEW ========== -->
     <div id="preview" class="column">
-      <div class="resume-paper">
+      <div class="resume-paper" id="resume-paper">
         <h2 class="preview-title">RESUME</h2>
+
         <div class="preview-header">
           <h3 id="preview-name">Your Name</h3>
           <p id="preview-contact">Contact Info</p>
@@ -61,42 +85,48 @@
           </div>
         </div>
 
-        <div id="preview-skills" class="preview-section">
+        <div class="preview-section">
           <h4>SKILLS</h4>
-          <p class="placeholder-text">Your skills will appear here.</p>
+          <div id="preview-skills">
+            <p class="placeholder-text">Your skills will appear here.</p>
+          </div>
         </div>
 
-        <div id="preview-experience" class="preview-section">
+        <div class="preview-section">
           <h4>EXPERIENCE</h4>
-          <p class="placeholder-text">Your experience will appear here.</p>
+          <div id="preview-experience">
+            <p class="placeholder-text">Your experience will appear here.</p>
+          </div>
         </div>
 
-        <div id="preview-strengths" class="preview-section">
+        <div class="preview-section">
           <h4>STRENGTHS</h4>
-          <p class="placeholder-text">Your strengths will appear here.</p>
+          <div id="preview-strengths">
+            <p class="placeholder-text">Your strengths will appear here.</p>
+          </div>
         </div>
 
-        <div id="preview-hobbies" class="preview-section">
+        <div class="preview-section">
           <h4>HOBBIES</h4>
-          <p class="placeholder-text">Your hobbies will appear here.</p>
+          <div id="preview-hobbies">
+            <p class="placeholder-text">Your hobbies will appear here.</p>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- AI Chatbot -->
+  <!-- ========== CHATBOX ========== -->
   <div id="chatbox">
-    <div id="chatbox-header">💡 AI Resume Coach</div>
+    <div id="chatbox-header">💡 AI Career Coach</div>
     <div id="chatbox-messages"></div>
     <div id="chatbox-input">
-      <input type="text" id="chat-input" placeholder="e.g. Google SWE role" />
+      <input type="text" id="chat-input" placeholder="e.g. 'Tips for data-science resume'" />
       <button onclick="sendChat()">Send</button>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="script.js"></script>
+  <!-- Local JS -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
