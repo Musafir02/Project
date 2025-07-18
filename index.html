@@ -1,97 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resume Maker</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Resume Builder</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header>
-    <h1>📄 Resume Maker</h1>
-    <p>Create and download your professional resume.</p>
-  </header>
-  
-  <main>
-    <form id="resume-form">
-      <fieldset>
-        <legend>Basic Details</legend>
-        <label for="name">Full Name</label>
-        <input type="text" placeholder="e.g. Jane Doe" id="name">
-        
-        <label for="email">Email Address</label>
-        <input type="email" placeholder="e.g. jane.doe@example.com" id="email">
-        
-        <label for="phone">Phone No.</label>
-        <input type="tel" placeholder="e.g. +91 12345 67890" id="phone">
-        
-        <label for="address">Address</label>
-        <input type="text" placeholder="e.g. 123 Main St, Anytown" id="address">
-      </fieldset>
+    <div class="main-container">
+        <div id="editor" class="column">
+            <header>
+                <h1>Live Resume Builder</h1>
+                <p>Fill in your details and see the preview update in real-time.</p>
+                <button type="button" id="pdf-btn">
+                    <span class="btn-text">Download PDF</span>
+                    <span class="spinner hidden"></span>
+                </button>
+            </header>
+            <form id="resume-form">
+                <fieldset>
+                    <legend>👤 Basic Details</legend>
+                    <label for="name">Full Name</label>
+                    <input type="text" placeholder="e.g. Priya Sharma" id="name" class="live-update" data-target="#preview-name">
+                    <label for="email">Email Address</label>
+                    <input type="email" placeholder="e.g. priya.sharma@email.com" id="email" class="live-update" data-target="#preview-email">
+                    <label for="phone">Phone No.</label>
+                    <input type="tel" placeholder="e.g. +91 98765 43210" id="phone" class="live-update" data-target="#preview-phone">
+                    <label for="address">Address</label>
+                    <input type="text" placeholder="e.g. Mumbai, Maharashtra" id="address" class="live-update" data-target="#preview-address">
+                </fieldset>
+                
+                <fieldset>
+                    <legend>🎓 Education</legend>
+                    <div id="education-list" class="live-update" data-target="#preview-education">
+                        </div>
+                    <div class="education-option">
+                        <label><input type="checkbox" name="education" value="SSC"> SSC</label>
+                        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="SSC">
+                    </div>
+                    <div class="education-option">
+                        <label><input type="checkbox" name="education" value="HSC"> HSC</label>
+                        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="HSC">
+                    </div>
+                    <div class="education-option">
+                        <label><input type="checkbox" name="education" value="B.Com"> B.Com</label>
+                        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="B.Com">
+                    </div>
+                </fieldset>
 
-      <fieldset>
-        <legend>Family Details</legend>
-        <label for="father">Father's Name</label>
-        <input type="text" id="father">
-        
-        <label for="mother">Mother's Name</label>
-        <input type="text" id="mother">
-        
-        <label for="marital">Marital Status</label>
-        <select id="marital">
-          <option value="Single">Single</option>
-          <option value="Married">Married</option>
-          <option value="Other">Other</option>
-        </select>
-      </fieldset>
-
-      <fieldset class="card">
-        <legend>🎓 Education</legend>
-        <div class="education-option">
-          <label><input type="checkbox" name="education" value="SSC"> SSC</label>
-          <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="SSC">
+                <fieldset>
+                    <legend>🛠️ Skills & Experience</legend>
+                    <label for="skills">Skills (comma-separated)</label>
+                    <input type="text" placeholder="e.g. Financial Modeling, MS Excel, Tally" id="skills" class="live-update" data-target="#preview-skills">
+                    
+                    <label for="experience">Experience</label>
+                    <textarea id="experience" rows="5" placeholder="Describe your professional experience..." class="live-update" data-target="#preview-experience"></textarea>
+                </fieldset>
+            </form>
         </div>
-        <div class="education-option">
-          <label><input type="checkbox" name="education" value="HSC"> HSC</label>
-          <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="HSC">
+
+        <div id="preview" class="column">
+            <div class="resume-paper">
+                <div class="preview-header">
+                    <h2 id="preview-name">Your Name</h2>
+                    <p>
+                        <span id="preview-email">your.email@example.com</span> | 
+                        <span id="preview-phone">+91 12345 67890</span> | 
+                        <span id="preview-address">Your City, State</span>
+                    </p>
+                </div>
+                <div class="preview-section">
+                    <h3>Education</h3>
+                    <ul id="preview-education">
+                        <li>Your education details will appear here.</li>
+                    </ul>
+                </div>
+                <div class="preview-section">
+                    <h3>Skills</h3>
+                    <p id="preview-skills">Your skills will appear here.</p>
+                </div>
+                <div class="preview-section">
+                    <h3>Experience</h3>
+                    <p id="preview-experience">Your work experience will appear here.</p>
+                </div>
+            </div>
         </div>
-        <div class="education-option">
-            <label><input type="checkbox" name="education" value="B.Com"> B.Com</label>
-            <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="B.Com">
-        </div>
-      </fieldset>
+    </div>
 
-      <fieldset>
-        <legend>🛠️ Skills & Experience</legend>
-        <label for="qualifications">Other Qualifications</label>
-        <input type="text" id="qualifications">
-        
-        <label for="skills">Skills (comma-separated)</label>
-        <input type="text" placeholder="e.g. Microsoft Excel, Tally, Public Speaking" id="skills">
-        
-        <label for="experience">Experience</label>
-        <textarea id="experience" rows="4" placeholder="Describe your work experience..."></textarea>
-        
-        <label for="languages">Languages Known</label>
-        <input type="text" id="languages" placeholder="e.g. English, Hindi, Marathi">
-        
-        <label for="strengths">Strengths</label>
-        <input type="text" id="strengths">
-        
-        <label for="hobbies">Hobbies</label>
-        <input type="text" id="hobbies">
-      </fieldset>
-
-      <button type="button" id="pdf-btn">Generate PDF Resume</button>
-    </form>
-  </main>
-
-  <footer>
-    <p>Made with ❤️ by Ibrahim</p>
-  </footer>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-  <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
