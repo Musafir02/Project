@@ -1,103 +1,133 @@
-// script.js
+document.addEventListener('DOMContentLoaded', () => {
+    
+  const elements = {
+    name: document.getElementById('name'),
+    email: document.getElementById('email'),
+    phone: document.getElementById('phone'),
+    address: document.getElementById('address'),
+    father: document.getElementById('father'),
+    mother: document.getElementById('mother'),
+    marital: document.getElementById('marital'),
+    qualifications: document.getElementById('qualifications'),
+    skills: document.getElementById('skills'),
+    experience: document.getElementById('experience'),
+    languages: document.getElementById('languages'),
+    strengths: document.getElementById('strengths'),
+    hobbies: document.getElementById('hobbies'),
+    pdfBtn: document.getElementById('pdf-btn'),
+    educationCheckboxes: document.querySelectorAll('input[name="education"]')
+  };
 
-function generateSuggestions() {
-  const job = document.getElementById("job").value;
-  const skills = document.getElementById("skills").value;
-  const experience = document.getElementById("experience").value;
-
-  const prompt = `The user wants to apply for the job role '${job}' with skills '${skills}' and experience '${experience}'. Suggest 5 skills, certifications, or topics to learn to be more competitive.`;
-
-  document.getElementById("suggestions").innerText = "Generating suggestions...";
-
-  fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer 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",
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://musafir02.github.io/Project",
-      "X-Title": "Smart Resume Maker"
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-4o",
-      messages: [{ role: "user", content: prompt }]
-    })
-  })
-    .then(res => res.json())
-    .then(data => {
-      const text = data.choices?.[0]?.message?.content || "No suggestions found.";
-      document.getElementById("suggestions").innerText = text;
-    })
-    .catch(() => {
-      document.getElementById("suggestions").innerText = "Failed to fetch suggestions.";
+  elements.pdfBtn.addEventListener('click', generatePDF);
+  
+  elements.educationCheckboxes.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const gradeInput = document.querySelector(`.edu-grade[data-for="${checkbox.value}"]`);
+      gradeInput.classList.toggle('hidden', !checkbox.checked);
+      if (!checkbox.checked) {
+        gradeInput.value = '';
+      }
     });
-}
+  });
 
-function generatePDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  function generatePDF() {
+    elements.pdfBtn.disabled = true;
+    elements.pdfBtn.innerText = "Generating...";
 
-  let y = 10;
+    try {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-  function write(label, value) {
-    doc.setFont("helvetica", "bold");
-    doc.text(label, 10, y);
-    doc.setFont("helvetica", "normal");
-    doc.text(value, 60, y);
-    y += 10;
+      let y = 20;
+      const leftMargin = 15;
+      const valueMargin = 70;
+
+      const writeLine = (label, value) => {
+        if (value) {
+          doc.setFont("helvetica", "bold");
+          doc.text(label, leftMargin, y);
+          doc.setFont("helvetica", "normal");
+          const textLines = doc.splitTextToSize(value, 120);
+          doc.text(textLines, valueMargin, y);
+          y += (textLines.length * 5) + 5;
+        }
+      };
+      
+      const writeSectionHeader = (title) => {
+          doc.setFontSize(16);
+          doc.setFont("helvetica", "bold");
+          doc.text(title, leftMargin, y);
+          y += 10;
+          doc.setLineWidth(0.5);
+          doc.line(leftMargin, y - 5, 200, y - 5);
+      };
+
+      doc.setFontSize(22);
+      doc.setFont("times", "bold");
+      doc.text(elements.name.value, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+      y += 10;
+      
+      const contactInfo = `${elements.email.value} | ${elements.phone.value} | ${elements.address.value}`;
+      doc.setFontSize(11);
+      doc.setFont("times", "normal");
+      doc.text(contactInfo, doc.internal.pageSize.getWidth() / 2, y, { align: 'center' });
+      y += 15;
+
+      const resumeSections = [
+        { title: "Personal Details", fields: [
+            { label: "Father's Name:", value: elements.father.value },
+            { label: "Mother's Name:", value: elements.mother.value },
+            { label: "Marital Status:", value: elements.marital.value },
+        ]},
+        { title: "Skills & Qualifications", fields: [
+            { label: "Skills:", value: elements.skills.value },
+            { label: "Other Qualifications:", value: elements.qualifications.value },
+            { label: "Languages:", value: elements.languages.value },
+        ]},
+        { title: "Experience", fields: [
+            { label: "", value: elements.experience.value },
+        ]},
+      ];
+      
+      resumeSections.forEach(section => {
+          if (section.fields.some(field => field.value)) {
+              writeSectionHeader(section.title);
+              section.fields.forEach(field => writeLine(field.label, field.value));
+              y += 5;
+          }
+      });
+
+      const eduData = collectEducationData();
+      if (eduData.length > 0) {
+        writeSectionHeader("Education");
+        doc.autoTable({
+          startY: y,
+          head: [['Qualification', 'Percentage/CGPA']],
+          body: eduData.map(e => [e.degree, e.grade]),
+          theme: 'grid',
+          headStyles: { fillColor: [76, 76, 255] }
+        });
+      }
+      
+      doc.save(`${elements.name.value || 'Resume'}.pdf`);
+
+    } catch(error) {
+      console.error("Failed to generate PDF:", error);
+      alert("An error occurred while generating the PDF.");
+    } finally {
+      elements.pdfBtn.disabled = false;
+      elements.pdfBtn.innerText = "Generate PDF Resume";
+    }
   }
 
-  write("Name:", document.getElementById("name").value);
-  write("Email:", document.getElementById("email").value);
-  write("Phone:", document.getElementById("phone").value);
-  write("Address:", document.getElementById("address").value);
-  write("Father:", document.getElementById("father").value);
-  write("Mother:", document.getElementById("mother").value);
-  write("Sisters:", document.getElementById("sisters").value);
-  write("Marital Status:", document.getElementById("marital").value);
-
-  // Education table
-  doc.setFont("helvetica", "bold");
-  doc.text("Education", 10, y);
-  y += 10;
-  const edu = collectEducationData();
-  doc.autoTable({
-    startY: y,
-    head: [["Qualification", "Percentage/CGPA"]],
-    body: edu.map(e => [e.degree, e.grade]),
-    theme: 'grid'
-  });
-  y = doc.previousAutoTable.finalY + 10;
-
-  write("Other Qualifications:", document.getElementById("qualifications").value);
-  write("Skills:", document.getElementById("skills").value);
-  write("Experience:", document.getElementById("experience").value);
-  write("Languages:", document.getElementById("languages").value);
-  write("Strengths:", document.getElementById("strengths").value);
-  write("Hobbies:", document.getElementById("hobbies").value);
-  write("Job Role:", document.getElementById("job").value);
-
-  doc.save("Resume.pdf");
-}
-
-function collectEducationData() {
-  const education = [];
-  document.querySelectorAll('input[name="education"]:checked').forEach((cb) => {
-    const grade = document.querySelector(`.edu-grade[data-for="${cb.value}"]`).value.trim();
-    education.push({ degree: cb.value, grade: grade || "N/A" });
-  });
-  return education;
-}
-
-// Toggle education grade inputs
-const educationCheckboxes = document.querySelectorAll('input[name="education"]');
-educationCheckboxes.forEach((checkbox) => {
-  checkbox.addEventListener("change", () => {
-    const gradeInput = document.querySelector(`.edu-grade[data-for="${checkbox.value}"]`);
-    if (checkbox.checked) {
-      gradeInput.classList.remove("hidden");
-    } else {
-      gradeInput.classList.add("hidden");
-      gradeInput.value = "";
-    }
-  });
+  function collectEducationData() {
+    const education = [];
+    elements.educationCheckboxes.forEach((cb) => {
+      if (cb.checked) {
+        const gradeInput = document.querySelector(`.edu-grade[data-for="${cb.value}"]`);
+        education.push({ degree: cb.value, grade: gradeInput.value.trim() || "N/A" });
+      }
+    });
+    return education;
+  }
 });

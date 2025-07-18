@@ -3,77 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Resume Maker</title>
+  <title>Resume Maker</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>📄 Smart Resume Maker</h1>
-    <p>Create your professional resume with ease!</p>
+    <h1>📄 Resume Maker</h1>
+    <p>Create and download your professional resume.</p>
   </header>
-  <form id="resume-form">
-    <!-- Basic Details -->
-    <input placeholder="Full Name" id="name">
-    <input placeholder="Email" id="email">
-    <input placeholder="WhatsApp No." id="phone">
-    <input placeholder="Address" id="address">
+  
+  <main>
+    <form id="resume-form">
+      <fieldset>
+        <legend>Basic Details</legend>
+        <label for="name">Full Name</label>
+        <input type="text" placeholder="e.g. Jane Doe" id="name">
+        
+        <label for="email">Email Address</label>
+        <input type="email" placeholder="e.g. jane.doe@example.com" id="email">
+        
+        <label for="phone">Phone No.</label>
+        <input type="tel" placeholder="e.g. +91 12345 67890" id="phone">
+        
+        <label for="address">Address</label>
+        <input type="text" placeholder="e.g. 123 Main St, Anytown" id="address">
+      </fieldset>
 
-    <!-- Family Details -->
-    <h2>Family Details</h2>
-    <input placeholder="Father's Name" id="father">
-    <input placeholder="Mother's Name" id="mother">
-    <input placeholder="Sisters" id="sisters">
-    <input placeholder="Marital Status" id="marital">
+      <fieldset>
+        <legend>Family Details</legend>
+        <label for="father">Father's Name</label>
+        <input type="text" id="father">
+        
+        <label for="mother">Mother's Name</label>
+        <input type="text" id="mother">
+        
+        <label for="marital">Marital Status</label>
+        <select id="marital">
+          <option value="Single">Single</option>
+          <option value="Married">Married</option>
+          <option value="Other">Other</option>
+        </select>
+      </fieldset>
 
-    <!-- Education -->
-    <div id="education-section" class="card">
-      <h2>🎓 Education</h2>
-      <div class="education-option">
-        <label><input type="checkbox" name="education" value="SSC"> SSC</label>
-        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="SSC">
-      </div>
-      <div class="education-option">
-        <label><input type="checkbox" name="education" value="HSC"> HSC</label>
-        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="HSC">
-      </div>
-      <div class="education-option">
-        <label><input type="checkbox" name="education" value="B.Com"> B.Com</label>
-        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="B.Com">
-      </div>
-      <div class="education-option">
-        <label><input type="checkbox" name="education" value="M.Com"> M.Com</label>
-        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="M.Com">
-      </div>
-      <div class="education-option">
-        <label><input type="checkbox" name="education" value="DTL"> DTL</label>
-        <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="DTL">
-      </div>
-    </div>
+      <fieldset class="card">
+        <legend>🎓 Education</legend>
+        <div class="education-option">
+          <label><input type="checkbox" name="education" value="SSC"> SSC</label>
+          <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="SSC">
+        </div>
+        <div class="education-option">
+          <label><input type="checkbox" name="education" value="HSC"> HSC</label>
+          <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="HSC">
+        </div>
+        <div class="education-option">
+            <label><input type="checkbox" name="education" value="B.Com"> B.Com</label>
+            <input type="text" placeholder="Percentage/CGPA" class="edu-grade hidden" data-for="B.Com">
+        </div>
+      </fieldset>
 
-    <!-- Other Details -->
-    <h2>🛠️ Other Details</h2>
-    <input placeholder="Other Qualifications" id="qualifications">
-    <input placeholder="Skills (e.g. Excel, Tally, PPT)" id="skills">
-    <input placeholder="Experience" id="experience">
-    <input placeholder="Languages Known" id="languages">
-    <input placeholder="Strengths" id="strengths">
-    <input placeholder="Hobbies" id="hobbies">
-    <input placeholder="Job Role Applying For" id="job">
+      <fieldset>
+        <legend>🛠️ Skills & Experience</legend>
+        <label for="qualifications">Other Qualifications</label>
+        <input type="text" id="qualifications">
+        
+        <label for="skills">Skills (comma-separated)</label>
+        <input type="text" placeholder="e.g. Microsoft Excel, Tally, Public Speaking" id="skills">
+        
+        <label for="experience">Experience</label>
+        <textarea id="experience" rows="4" placeholder="Describe your work experience..."></textarea>
+        
+        <label for="languages">Languages Known</label>
+        <input type="text" id="languages" placeholder="e.g. English, Hindi, Marathi">
+        
+        <label for="strengths">Strengths</label>
+        <input type="text" id="strengths">
+        
+        <label for="hobbies">Hobbies</label>
+        <input type="text" id="hobbies">
+      </fieldset>
 
-    <!-- Career Suggestions -->
-    <div class="card">
-      <h2>🧠 Career Suggestions</h2>
-      <p id="suggestions">No suggestions yet.</p>
-      <button type="button" onclick="generateSuggestions()">Generate Suggestions</button>
-    </div>
+      <button type="button" id="pdf-btn">Generate PDF Resume</button>
+    </form>
+  </main>
 
-    <!-- PDF Button -->
-    <button type="button" onclick="generatePDF()">Generate PDF Resume</button>
-  </form>
   <footer>
     <p>Made with ❤️ by Ibrahim</p>
   </footer>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
