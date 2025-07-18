@@ -22,10 +22,12 @@ input, textarea, button {
 .main-container {
   display: flex;
   min-height: 100vh;
+  gap: 2rem;
+  padding: 1rem;
 }
 .column {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
 }
 @media (max-width: 900px) {
   .main-container {
@@ -37,15 +39,26 @@ input, textarea, button {
 form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 fieldset {
+  background: white;
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   border: none;
-  padding: 0;
+  margin-bottom: 1.5rem;
+}
+body.dark fieldset {
+  background: #2a2a2a;
 }
 legend {
   font-weight: 700;
-  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  margin-bottom: 0.7rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 input, textarea {
   width: 100%;
@@ -53,6 +66,8 @@ input, textarea {
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
+  margin-top: 6px;
+  margin-bottom: 12px;
 }
 input::placeholder,
 textarea::placeholder {
@@ -90,6 +105,30 @@ button.danger:hover {
 }
 .add-btn {
   margin-top: 0.5rem;
+}
+
+/* ======== Education Entry Box ======== */
+.edu-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: #f0f2f5;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+body.dark .edu-entry {
+  background: #2e2e2e;
+}
+.edu-entry input {
+  flex: 1 1 45%;
+  min-width: 120px;
+}
+.edu-entry button {
+  background-color: #d63031;
+  border-radius: 4px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.9rem;
 }
 
 /* ======== Resume Paper (Preview) ======== */
@@ -193,4 +232,31 @@ body.dark #chatbox {
 body.dark .theme-toggle {
   background: #333;
   color: white;
+}
+
+/* ======== Mobile Responsive ======== */
+@media (max-width: 768px) {
+  .main-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .column {
+    width: 100%;
+    padding: 1rem;
+  }
+  #chatbox {
+    right: 10px;
+    left: 10px;
+    width: auto;
+  }
+  .resume-paper {
+    padding: 1rem;
+  }
+  .preview-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .edu-entry input {
+    flex: 1 1 100%;
+  }
 }
