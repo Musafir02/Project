@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>📄 Smart Resume Maker</h1>
-    <p>Create your resume and get smart suggestions!</p>
+    <p>Create your professional resume with ease!</p>
     <button id="themeToggle">🌗 Toggle Theme</button>
   </header>  <main>
     <section class="form-section">
@@ -18,18 +18,75 @@
           <label for="name">Full Name</label>
           <input type="text" id="name" required />
         </div><div class="form-group">
-      <label for="dob">Date of Birth</label>
-      <input type="date" id="dob" required />
+      <label for="email">Email</label>
+      <input type="email" id="email" required />
     </div>
 
     <div class="form-group">
-      <label for="education">Education</label>
+      <label for="phone">WhatsApp No.</label>
+      <input type="tel" id="phone" required />
+    </div>
+
+    <div class="form-group">
+      <label for="address">Address</label>
+      <textarea id="address" required></textarea>
+    </div>
+
+    <h3>Family Details</h3>
+    <div class="form-group">
+      <label for="father">Father's Name</label>
+      <input type="text" id="father" required />
+    </div>
+
+    <div class="form-group">
+      <label for="mother">Mother's Name</label>
+      <input type="text" id="mother" required />
+    </div>
+
+    <div class="form-group">
+      <label for="sisters">Sisters</label>
+      <input type="text" id="sisters" />
+    </div>
+
+    <div class="form-group">
+      <label for="marital">Marital Status</label>
+      <input type="text" id="marital" />
+    </div>
+
+    <h3>Education</h3>
+    <div class="form-group">
+      <label for="education">Education Details (include SSC, HSC, Degrees)</label>
       <textarea id="education" required></textarea>
     </div>
 
+    <h3>Other Qualifications</h3>
     <div class="form-group">
-      <label for="skills">Skills (comma separated)</label>
-      <input type="text" id="skills" required />
+      <textarea id="otherQualifications" required></textarea>
+    </div>
+
+    <h3>Skills</h3>
+    <div class="form-group">
+      <input type="text" id="skills" placeholder="e.g., Excel, Tally, PPT" required />
+    </div>
+
+    <h3>Experience</h3>
+    <div class="form-group">
+      <textarea id="experience" required></textarea>
+    </div>
+
+    <h3>Languages Known</h3>
+    <div class="form-group">
+      <input type="text" id="languages" required />
+    </div>
+
+    <h3>Strengths</h3>
+    <div class="form-group">
+      <textarea id="strengths" required></textarea>
+    </div>
+
+    <h3>Hobbies</h3>
+    <div class="form-group">
+      <textarea id="hobbies" required></textarea>
     </div>
 
     <div class="form-group">
@@ -37,7 +94,7 @@
       <input type="text" id="job" required />
     </div>
 
-    <button type="submit">Generate Resume</button>
+    <button type="submit">Generate PDF Resume</button>
   </form>
 </section>
 
@@ -49,5 +106,5 @@
 
   </main>  <footer>
     <p>Made with ❤️ by Ibrahim</p>
-  </footer>  <script src="script.js"></script></body>
+  </footer>  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  <script src="script.js"></script></body>
 </html>
